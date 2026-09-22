@@ -96,16 +96,8 @@ Composite.add(engine.world, [
   Bodies.rectangle(W+WALL_T/2, H/2, WALL_T, H*2, wallOpts),
 ]);
 
-// ==================== 游戏状态 ====================
-let score = 0, currentTier = 0, nextTier = randTier();
-let gameOver = false, canDrop = true, dropCooldown = 0;
-let uniBodies = [], particles = [], previewX = W/2;
-let highScore = parseInt(localStorage.getItem('mergeUniHighScore') || '0');
-document.getElementById('high-score').textContent = '最高分: ' + highScore;
-
 // 动态生成概率：首次合成 lv4+ 时调整
 let pTier0 = 0.79, pTier1 = 0.19, pTier2 = 0.02;
-const reachedTiers = new Set(); // 记录已合成过的等级
 
 function randTier(){
   const r = Math.random();
@@ -113,6 +105,15 @@ function randTier(){
   if(r < pTier0 + pTier1) return 1;
   return 2;
 }
+
+// ==================== 游戏状态 ====================
+let score = 0, currentTier = 0, nextTier = randTier();
+let gameOver = false, canDrop = true, dropCooldown = 0;
+let uniBodies = [], particles = [], previewX = W/2;
+let highScore = parseInt(localStorage.getItem('mergeUniHighScore') || '0');
+document.getElementById('high-score').textContent = '最高分: ' + highScore;
+
+const reachedTiers = new Set(); // 记录已合成过的等级
 
 // ==================== Canvas 渲染 ====================
 const canvas = document.getElementById('gameCanvas');
