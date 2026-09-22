@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mod 社区如何拯救了 Minecraft 的中国？ — 游戏史考据</title>
+<meta name="description" content="从盗版时代到网易收编：Mod 社区如何拯救了 Minecraft 的中国？—— Route A 游戏史考据作业">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* ========== RESET & BASE ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --grass-green: #5D9B37;
+  --grass-top: #7CBD48;
+  --dirt-brown: #8B6914;
+  --dirt-dark: #6B4C12;
+  --stone-gray: #7F7F7F;
+  --stone-dark: #5A5A5A;
+  --sky-blue: #87CEEB;
+  --sky-dark: #5BA3C9;
+  --creeper-green: #47A147;
+  --ender-purple: #7B3F9E;
+  --nether-red: #AA3232;
+  --gold: #FCDB05;
+  --diamond: #5DECF5;
+  --redstone: #FF1A1A;
+  --bg-dark: #1a1a2e;
+  --bg-darker: #0f0f1a;
+  --text-light: #e8e8e8;
+  --text-muted: #a0a0b0;
+  --pixel-border: 4px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background-color: var(--bg-darker);
+  color: var(--text-light);
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+/* ========== PIXEL FONT UTILITY ========== */
+.pixel-font {
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 1px;
+}
+
+/* ========== HERO SECTION ========== */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(180deg, #1a0a2e 0%, #0d1b2a 40%, #1b2838 100%);
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 30% 50%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2px 2px at 50% 10%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2px 2px at 70% 40%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(2px 2px at 90% 60%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2px 2px at 15% 80%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2px 2px at 45% 70%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(2px 2px at 80% 85%, rgba(255,255,255,0.5), transparent);
+  animation: twinkle 4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+.hero-question-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.45rem, 1vw, 0.6rem);
+  color: var(--redstone);
+  background: rgba(255,26,26,0.1);
+  border: 2px solid rgba(255,26,26,0.3);
+  padding: 6px 16px;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+  letter-spacing: 2px;
+}
+
+.hero-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1.2rem, 3.5vw, 2.4rem);
+  color: var(--grass-top);
+  text-shadow:
+    4px 4px 0 var(--dirt-dark),
+    -1px -1px 0 rgba(0,0,0,0.5);
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+  line-height: 1.8;
+}
+
+.hero-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.5rem, 1.2vw, 0.75rem);
+  color: var(--gold);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+  line-height: 2.2;
+}
+
+.hero-desc {
+  max-width: 750px;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
+  line-height: 2;
+}
+
+.hero-meta {
+  font-size: 0.85rem;
+  color: var(--stone-gray);
+  position: relative;
+  z-index: 1;
+  margin-bottom: 3rem;
+}
+
+.hero-blocks {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
+}
+
+.pixel-block {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  animation: float 3s ease-in-out infinite;
+}
+
+.pixel-block:nth-child(2) { animation-delay: 0.5s; }
+.pixel-block:nth-child(3) { animation-delay: 1s; }
+.pixel-block:nth-child(4) { animation-delay: 1.5s; }
+.pixel-block:nth-child(5) { animation-delay: 2s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.block-grass {
+  background: linear-gradient(180deg, var(--grass-top) 0%, var(--grass-top) 25%, var(--dirt-brown) 25%, var(--dirt-brown) 100%);
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), inset 4px 4px 0 rgba(255,255,255,0.15);
+}
+
+.block-dirt {
+  background: var(--dirt-brown);
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), inset 4px 4px 0 rgba(255,255,255,0.15);
+}
+
+.block-stone {
+  background: var(--stone-gray);
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), inset 4px 4px 0 rgba(255,255,255,0.15);
+}
+
+.block-diamond {
+  background: var(--diamond);
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), inset 4px 4px 0 rgba(255,255,255,0.3);
+}
+
+.block-gold {
+  background: var(--gold);
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), inset 4px 4px 0 rgba(255,255,255,0.3);
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  animation: bounce 2s infinite;
+  z-index: 1;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+/* ========== NAVIGATION ========== */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-dark);
+  border-bottom: 4px solid var(--grass-green);
+  padding: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.48rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 1rem 1rem;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: var(--grass-top);
+  background: rgba(93, 155, 55, 0.1);
+  border-bottom-color: var(--grass-top);
+}
+
+/* ========== SECTIONS ========== */
+.section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.85rem, 2vw, 1.3rem);
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
+.section-title.green { color: var(--grass-top); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+.section-title.blue { color: var(--diamond); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+.section-title.gold { color: var(--gold); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+.section-title.purple { color: var(--ender-purple); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+.section-title.red { color: var(--redstone); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+
+.section-desc {
+  color: var(--text-muted);
+  font-size: 1rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ========== GROUND DECORATION ========== */
+.ground-deco {
+  height: 32px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--grass-green) 0px,
+      var(--grass-green) 32px,
+      var(--grass-top) 32px,
+      var(--grass-top) 64px
+    );
+  position: relative;
+}
+
+.ground-deco::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--dirt-brown) 0px,
+      var(--dirt-brown) 32px,
+      var(--dirt-dark) 32px,
+      var(--dirt-dark) 64px
+    );
+}
+
+/* ========== CHAPTER DIVIDER ========== */
+.chapter-divider {
+  text-align: center;
+  padding: 3rem 1rem;
+  position: relative;
+}
+
+.chapter-divider .pixel-art-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.chapter-divider .mini-block {
+  width: 16px;
+  height: 16px;
+}
+
+/* ========== ARGUMENT BLOCKS (核心论证) ========== */
+.arg-block {
+  background: rgba(255,255,255,0.04);
+  border: 3px solid rgba(255,255,255,0.08);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.2s;
+}
+
+.arg-block:hover {
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+.arg-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.arg-block.green::before { background: var(--grass-green); }
+.arg-block.blue::before { background: var(--diamond); }
+.arg-block.gold::before { background: var(--gold); }
+.arg-block.purple::before { background: var(--ender-purple); }
+.arg-block.red::before { background: var(--redstone); }
+
+.arg-block h3 {
+  font-weight: 900;
+  font-size: 1.15rem;
+  margin-bottom: 0.8rem;
+  color: #fff;
+}
+
+.arg-block p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.9;
+}
+
+/* ========== THESIS BOX (核心论点) ========== */
+.thesis-box {
+  background: linear-gradient(135deg, rgba(93,155,55,0.08), rgba(125,189,72,0.04));
+  border: 3px solid var(--grass-green);
+  border-left: 6px solid var(--grass-top);
+  padding: 2rem 2.5rem;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.thesis-box::before {
+  content: '💡';
+  position: absolute;
+  top: -14px;
+  left: 20px;
+  font-size: 1.5rem;
+  background: var(--bg-darker);
+  padding: 0 8px;
+}
+
+.thesis-box .thesis-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: var(--grass-top);
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+.thesis-box p {
+  font-size: 1.05rem;
+  color: var(--text-light);
+  line-height: 2;
+  font-weight: 700;
+}
+
+/* ========== EVIDENCE BOX (证据) ========== */
+.evidence {
+  background: linear-gradient(135deg, rgba(252,219,5,0.06), rgba(252,219,5,0.02));
+  border: 2px solid rgba(252,219,5,0.3);
+  border-left: 4px solid var(--gold);
+  padding: 1.2rem 1.5rem;
+  margin: 1.2rem 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.evidence .ev-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  color: var(--gold);
+  background: rgba(252,219,5,0.1);
+  padding: 2px 8px;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+.evidence a {
+  color: var(--diamond);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(93,236,245,0.3);
+}
+
+.evidence a:hover {
+  color: var(--grass-top);
+  border-bottom-color: var(--grass-top);
+}
+
+/* ========== CHINA CARD (中国专题) ========== */
+.china-card {
+  background: linear-gradient(135deg, rgba(170,50,50,0.08), rgba(252,219,5,0.04));
+  border: 3px solid rgba(170,50,50,0.25);
+  border-left: 6px solid var(--redstone);
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.china-card .china-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  color: var(--redstone);
+  background: rgba(255,26,26,0.1);
+  padding: 3px 10px;
+  display: inline-block;
+  margin-bottom: 0.8rem;
+}
+
+.china-card h3 {
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: #fff;
+  margin-bottom: 0.6rem;
+}
+
+.china-card p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.9;
+}
+
+/* ========== ANALYSIS GRID (分析) ========== */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.analysis-card {
+  background: rgba(255,255,255,0.04);
+  border: 3px solid rgba(255,255,255,0.08);
+  padding: 1.8rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.analysis-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.analysis-card.c1::before { background: var(--grass-green); }
+.analysis-card.c2::before { background: var(--diamond); }
+.analysis-card.c3::before { background: var(--gold); }
+.analysis-card.c4::before { background: var(--ender-purple); }
+
+.analysis-card:hover {
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-4px);
+}
+
+.analysis-card h3 {
+  font-weight: 900;
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+  color: #fff;
+}
+
+.analysis-card p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+/* ========== SOURCE LIST (参考文献) ========== */
+.source-list {
+  margin-top: 2rem;
+}
+
+.source-group {
+  margin-bottom: 2rem;
+}
+
+.source-group h3 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--diamond);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(93,236,245,0.2);
+}
+
+.source-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  transition: border-color 0.2s;
+}
+
+.source-item:hover {
+  border-color: rgba(255,255,255,0.15);
+}
+
+.source-item .src-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  color: var(--gold);
+  background: rgba(252,219,5,0.1);
+  padding: 2px 6px;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.source-item a {
+  color: var(--diamond);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(93,236,245,0.3);
+  word-break: break-all;
+}
+
+.source-item a:hover {
+  color: var(--grass-top);
+  border-bottom-color: var(--grass-top);
+}
+
+/* ========== NARRATIVE TEXT ========== */
+.narrative {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 2;
+  margin-bottom: 1.5rem;
+  max-width: 850px;
+}
+
+.narrative strong {
+  color: var(--text-light);
+  font-weight: 700;
+}
+
+.narrative em {
+  color: var(--gold);
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* ========== FOOTER ========== */
+.footer {
+  text-align: center;
+  padding: 3rem 1rem;
+  border-top: 4px solid var(--grass-green);
+  background: var(--bg-dark);
+}
+
+.footer p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.footer .pixel-font {
+  font-size: 0.5rem;
+  color: var(--grass-green);
+}
+
+/* ========== ANIMATIONS ========== */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--grass-green);
+  border: 2px solid var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--grass-top);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .nav-link {
+    font-size: 0.4rem;
+    padding: 0.8rem 0.5rem;
+  }
+
+  .hero-blocks {
+    gap: 8px;
+  }
+
+  .pixel-block {
+    width: 36px;
+    height: 36px;
+  }
+
+  .thesis-box {
+    padding: 1.5rem;
+  }
+
+  .arg-block {
+    padding: 1.5rem;
+  }
+
+  .china-card {
+    padding: 1.5rem;
+  }
+
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-inner {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero" id="top">
+  <div class="hero-blocks">
+    <div class="pixel-block block-grass"></div>
+    <div class="pixel-block block-dirt"></div>
+    <div class="pixel-block block-stone"></div>
+    <div class="pixel-block block-diamond"></div>
+    <div class="pixel-block block-gold"></div>
+  </div>
+  <div class="hero-question-label">ROUTE A · 游戏史考据</div>
+  <h1 class="hero-title">Mod 社区如何拯救了<br>Minecraft 的中国？</h1>
+  <p class="hero-subtitle">从盗版时代到网易收编：一段"自下而上"的游戏本土化史</p>
+  <p class="hero-desc">
+    Minecraft 在全球是"开放架构"的典范，但在中国，它的故事远比官方叙事复杂。
+    在网易正式代理之前的近六年里，是盗版、Mod 社区和第三方工具"养活"了这个游戏在中国的传播。
+    本研究追问：当一款游戏没有官方渠道进入一个国家时，Mod 社区如何充当了"影子发行商"的角色？
+    而当官方最终到来时，这个社区又经历了怎样的命运？
+  </p>
+  <p class="hero-meta">
+    课程：电子游戏改造人类世界的历史 · 作业形式：互动网页 · 研究路线：Route A 游戏史考据
+  </p>
+  <div class="scroll-hint pixel-font">▼ 向下阅读 ▼</div>
+</section>
+
+<!-- ==================== NAV ==================== -->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="#s1" class="nav-link">研究问题</a>
+    <a href="#s2" class="nav-link">开放架构</a>
+    <a href="#s3" class="nav-link">盗版时代</a>
+    <a href="#s4" class="nav-link">Mod生态</a>
+    <a href="#s5" class="nav-link">多玩盒子</a>
+    <a href="#s6" class="nav-link">网易收编</a>
+    <a href="#s7" class="nav-link">分析结论</a>
+    <a href="#s8" class="nav-link">参考文献</a>
+  </div>
+</nav>
+
+<div class="ground-deco"></div>
+
+<!-- ==================== S1: 研究问题与核心论点 ==================== -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <h2 class="section-title green">研究问题与核心论点</h2>
+    <p class="section-desc">在正式展开叙述之前，先明确本研究要回答的问题和核心判断。</p>
+  </div>
+
+  <div class="thesis-box fade-in">
+    <span class="thesis-label">核心论点 THESIS</span>
+    <p>Minecraft 之所以能在中国取得8亿注册用户的空前成功，并非因为网易的运营策略，而是因为在此前长达六年的"无官方"时期，Mod 社区和第三方工具已经完成了游戏的本土化——翻译、分发、教学、社交，形成了一个自给自足的"影子生态"。网易所做的，本质上是"收编"了一个已经成熟的民间生态。</p>
+  </div>
+
+  <div class="arg-block green fade-in">
+    <h3>本研究试图回答的三个子问题</h3>
+    <p>
+      <strong>1.</strong> Minecraft 的"开放架构"（开源服务端、Mod 友好）在全球范围内催生了怎样的社区文化？这种文化有什么特殊性？<br><br>
+      <strong>2.</strong> 在缺乏官方渠道的中国，Mod 社区如何填补了发行、翻译、教学、社交的多重空白？它扮演了什么角色？<br><br>
+      <strong>3.</strong> 当网易以"正版化"方式收编这个民间生态时，发生了什么？社区经历了怎样的转型？这种"收编模式"对中国游戏市场有什么启示？
+    </p>
+  </div>
+
+  <div class="arg-block gold fade-in">
+    <h3>为什么这个问题值得研究？</h3>
+    <p>
+      课程第四讲"中国游戏产业的另类生长"指出，中国游戏市场有着与西方截然不同的发展路径——盗版、私服、页游、手游，构成了独特的"中国特色"。Minecraft 的中国故事恰好处于这个交叉点上：它既是一个全球性游戏IP的本土化案例，又是中国"非正规"游戏传播史的缩影。
+      通过研究这段历史，我们可以理解：当官方缺席时，玩家社区能走多远？而当官方到来时，社区的创造力是被保留还是被消解？
+    </p>
+  </div>
+</section>
+
+<!-- ==================== S2: 开放架构 — Mod文化的全球起源 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-grass"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-grass"></div>
+  </div>
+</div>
+
+<section class="section" id="s2">
+  <div class="section-header">
+    <h2 class="section-title blue">开放架构：Mod 文化的全球起源</h2>
+    <p class="section-desc">要理解中国的故事，先要理解 Minecraft 为什么天生就是一款"属于社区"的游戏。</p>
+  </div>
+
+  <p class="narrative fade-in">
+    2009年，Markus "Notch" Persson 发布了 Minecraft 的第一个版本。与同时代的大多数商业游戏不同，Minecraft 从诞生之初就具备几个关键的"开放性"特征，这些特征决定了它日后的社区命运。
+  </p>
+
+  <div class="arg-block blue fade-in">
+    <h3>三个关键的"开放"设计决策</h3>
+    <p>
+      <strong>第一，Java 编写，天然可反编译。</strong>Minecraft 用 Java 编写，而 Java 的 .class 文件极易被反编译为源代码。这意味着任何有一定编程能力的玩家都可以阅读、理解甚至修改游戏的内部逻辑。这不是 Notch 的刻意设计，但客观上为 Mod 文化打开了大门。<br><br>
+      <strong>第二，服务端代码公开。</strong>Minecraft 的多人游戏服务端代码由 Mojang 官方提供下载，任何人都可以搭建自己的服务器。这使得"私服"成为游戏社交的核心场景，也为后来的小游戏服务器（如 Hypixel）奠定了基础。<br><br>
+      <strong>第三，数据驱动的资源系统。</strong>游戏的材质、模型、音效等都以简单的文件形式存储，替换它们不需要修改代码。这让"材质包"和"地图"成为最低门槛的创作形式。
+    </p>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 1</span>
+    Bukkit 项目（2010年启动）是 Minecraft 最早的 Mod 框架之一，其 GitHub 仓库显示，到2014年已有超过200名贡献者和数千个插件。<a href="https://github.com/Bukkit/Bukkit" target="_blank">github.com/Bukkit/Bukkit</a>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 2</span>
+    MinecraftForge 是另一个核心 Mod 加载框架，它让不同 Mod 之间可以共存而不冲突。Forge 的出现使得"整合包"（将数十个 Mod 打包在一起）成为可能，这直接影响了后来的中国"盒子"类工具。<a href="https://github.com/MinecraftForge/MinecraftForge" target="_blank">github.com/MinecraftForge/MinecraftForge</a>
+  </div>
+
+  <p class="narrative fade-in">
+    这些技术特征共同构成了一个<strong>"开放架构"</strong>：游戏的核心代码可以被阅读和修改，服务端可以自由搭建，资源可以被轻松替换。在这个架构之上，全球社区发展出了三层创作生态——<strong>Mod</strong>（修改游戏逻辑）、<strong>材质包</strong>（修改游戏外观）、<strong>自定义地图</strong>（修改游戏内容）。这三层生态在全球范围内蓬勃发展，但在中国，它们扮演了一个额外的、独特的角色。
+  </p>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 3</span>
+    SpigotMC 是 Bukkit 的继任项目，至今仍是最大的 Minecraft 服务端社区之一。其插件库收录了超过10万个插件，涵盖小游戏、经济系统、管理工具等几乎所有 imaginable 的功能。<a href="https://www.spigotmc.org/" target="_blank">spigotmc.org</a>
+  </div>
+</section>
+
+<!-- ==================== S3: 盗版时代 — 意外的本土化 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-red" style="background:var(--redstone);box-shadow:inset -2px -2px 0 rgba(0,0,0,0.2),inset 2px 2px 0 rgba(255,255,255,0.15)"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-red" style="background:var(--redstone);box-shadow:inset -2px -2px 0 rgba(0,0,0,0.2),inset 2px 2px 0 rgba(255,255,255,0.15)"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-red" style="background:var(--redstone);box-shadow:inset -2px -2px 0 rgba(0,0,0,0.2),inset 2px 2px 0 rgba(255,255,255,0.15)"></div>
+  </div>
+</div>
+
+<section class="section" id="s3">
+  <div class="section-header">
+    <h2 class="section-title red">盗版时代：意外的本土化</h2>
+    <p class="section-desc">2010-2016年，Minecraft 在中国没有官方渠道。但正是这段"缺席"，催生了一个独特的民间生态。</p>
+  </div>
+
+  <div class="china-card fade-in">
+    <span class="china-tag">🇨🇳 中国背景</span>
+    <h3>为什么 Minecraft 在中国是"盗版先行"？</h3>
+    <p>
+      2010年前后，中国玩家购买海外正版游戏面临多重障碍：没有官方销售渠道、不支持支付宝/微信支付、英语门槛、以及对"花钱买一个画面粗糙的方块游戏"的不理解。在这种环境下，盗版不仅是"贪便宜"，更是一种<strong>结构性的必然</strong>。Minecraft 的 Java 版本天然易于传播——一个 .jar 文件加上启动器，就可以在任何电脑上运行。
+    </p>
+  </div>
+
+  <p class="narrative fade-in">
+    然而，"盗版"这个词远不能概括当时发生的一切。在盗版传播的过程中，一系列<strong>本土化工作</strong>自发地展开了——而这些工作，本应由官方发行商来完成。
+  </p>
+
+  <div class="arg-block red fade-in">
+    <h3>民间完成的四大本土化工作</h3>
+    <p>
+      <strong>1. 翻译与汉化。</strong>Minecraft 的早期版本几乎没有中文支持。百度贴吧"Minecraft吧"的玩家自发翻译了游戏内的物品名称、合成配方、提示信息。这些翻译后来部分被 Mojang 采纳为官方中文。<br><br>
+      <strong>2. 教程与知识传播。</strong>B站（bilibili）上的 Minecraft 教程视频是中文世界最早、最系统的游戏教学内容。从"如何合成工作台"到"红石电路入门"再到"Forge 安装指南"，UP主们用视频填补了官方文档的空白。<br><br>
+      <strong>3. 分发与下载。</strong>由于无法从官方渠道获取游戏，中国玩家依赖各种第三方下载站、论坛帖子、QQ群分享来获取游戏文件和 Mod。这些渠道虽然"不正规"，但客观上完成了游戏的分发。<br><br>
+      <strong>4. 社区建设。</strong>百度贴吧、MCBBS（Minecraft中文论坛）、QQ群构成了三层社区结构。新手在贴吧提问，进阶玩家在论坛交流 Mod 开发，核心玩家在 QQ 群里协作运营服务器。
+    </p>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 4</span>
+    MCBBS（mcbbbs.net）曾是中国最大的 Minecraft 社区论坛，巅峰时期注册用户超过百万。论坛设有 Mod 发布、整合包分享、服务器宣传、建筑展示等数十个板块，形成了一个自给自足的信息生态。该网站于2024年关闭，但其 Web Archive 存档仍可查阅。<a href="https://web.archive.org/web/2024*/mcbbbs.net" target="_blank">Web Archive: mcbbbs.net</a>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 5</span>
+    百度"Minecraft吧"在2013-2016年间是中文 Minecraft 社区的核心阵地，关注人数超过300万。贴吧内不仅有新手求助和作品展示，还有玩家自发组织的 Mod 评测、服务器推荐、版本更新解读等内容。<a href="https://tieba.baidu.com/f?kw=minecraft" target="_blank">tieba.baidu.com/f?kw=minecraft</a>
+  </div>
+
+  <div class="thesis-box fade-in">
+    <span class="thesis-label">关键判断</span>
+    <p>盗版时期的中国 Minecraft 社区，实际上完成了一个"影子发行商"的全部职能：翻译、分发、教学、客服、社区运营。这不是简单的"盗版传播"，而是一次自发的、系统性的游戏本土化。</p>
+  </div>
+</section>
+
+<!-- ==================== S4: Mod 生态的繁荣 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-gold"></div>
+  </div>
+</div>
+
+<section class="section" id="s4">
+  <div class="section-header">
+    <h2 class="section-title gold">Mod 生态的繁荣：从"玩游戏"到"做游戏"</h2>
+    <p class="section-desc">当基础的游戏传播完成之后，中国社区开始向更深层的创作迈进。</p>
+  </div>
+
+  <p class="narrative fade-in">
+    如果说翻译和分发解决了"怎么玩"的问题，那么 Mod 生态解决的就是"<strong>玩什么</strong>"的问题。Minecraft 原版游戏提供的是基础框架——方块、合成、生存。而 Mod 社区把它变成了一个无限的平台。
+  </p>
+
+  <div class="arg-block gold fade-in">
+    <h3>中国 Mod 社区的三个层次</h3>
+    <p>
+      <strong>1. Mod 翻译与本地化。</strong>大量英文 Mod 被中国玩家翻译成中文。这不仅是语言翻译，还涉及文化适配——例如将 Mod 中的节日内容与中国节日关联，添加中文特有的说明和提示。<br><br>
+      <strong>2. 整合包的创造。</strong>整合包（Modpack）是将数十甚至数百个 Mod 组合在一起，形成一个完整的游戏体验。中国社区创造了大量具有本土特色的整合包，如"工业时代""神秘时代""魔法与科技"等主题包。这些整合包往往附带详细的中文安装教程和配置说明。<br><br>
+      <strong>3. 原创 Mod 开发。</strong>中国开发者也开始创作原创 Mod。一些中国 Mod 在国际社区获得了知名度，如"拔刀剑"（SlashBlade）等。中文 Mod 开发教程在 B站 和 MCBBS 上广泛传播，培养了一批年轻的 Java 开发者。
+    </p>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 6</span>
+    Minecraft 中文 Wiki（zh.minecraft.wiki）由社区维护，收录了数千个页面的游戏资料，包括物品、生物、机制、Mod 介绍等。它是中文世界最全面的 Minecraft 知识库，完全由志愿者编辑和维护。<a href="https://zh.minecraft.wiki/" target="_blank">zh.minecraft.wiki</a>
+  </div>
+
+  <div class="china-card fade-in">
+    <span class="china-tag">🇨🇳 独特现象</span>
+    <h3>"整合包"作为中国玩家的"游戏入口"</h3>
+    <p>
+      在欧美，玩家通常自己挑选和安装 Mod；但在中国，整合包成为了大多数玩家接触 Mod 的主要方式。这是因为整合包解决了中国玩家面临的核心痛点：不需要英语能力、不需要理解 Mod 之间的兼容性、不需要手动配置文件。一个整合包就是一个"开箱即用"的完整游戏体验。这种模式后来被多玩盒子等工具进一步简化，最终演变为网易中国版的"组件中心"。
+    </p>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 7</span>
+    Hypixel 是全球最大的 Minecraft 多人服务器，其小游戏模式（起床战争、空岛战争等）在全球拥有数百万玩家。中国玩家通过视频了解了 Hypixel 的玩法，随后国内涌现了大量模仿者，这些"小游戏服务器"成为中国 Minecraft 社区最活跃的社交场景之一。<a href="https://hypixel.net/" target="_blank">hypixel.net</a>
+  </div>
+</section>
+
+<!-- ==================== S5: 多玩盒子 — Mod 的大众化 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-grass"></div>
+    <div class="mini-block block-dirt"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-dirt"></div>
+    <div class="mini-block block-grass"></div>
+  </div>
+</div>
+
+<section class="section" id="s5">
+  <div class="section-header">
+    <h2 class="section-title purple">多玩盒子：Mod 的大众化</h2>
+    <p class="section-desc">如果 Mod 社区是"精英层"，那么多玩盒子就是让普通玩家也能享受 Mod 的"桥梁"。</p>
+  </div>
+
+  <p class="narrative fade-in">
+    2014年前后，一个名为<strong>"多玩我的世界盒子"</strong>的工具出现了。它由多玩游戏（YY旗下的游戏平台）开发，本质上是一个<strong>集成了 Mod 管理、多人联机、地图下载、社区交流等功能的一站式工具</strong>。它的出现，标志着 Minecraft 在中国从"核心玩家圈"走向"大众玩家群"。
+  </p>
+
+  <div class="arg-block purple fade-in">
+    <h3>多玩盒子做了什么？</h3>
+    <p>
+      <strong>一键安装 Mod。</strong>玩家不再需要手动下载 .jar 文件、放入 mods 文件夹、处理兼容性问题。在盒子里，点击一下就能安装 Mod。这极大地降低了 Mod 的使用门槛。<br><br>
+      <strong>内置多人联机。</strong>盒子提供了内置的服务器列表和一键加入功能。玩家不需要知道 IP 地址、不需要配置端口转发，就能和朋友联机。这对于中国网络环境（NAT 类型复杂、没有加速器）尤为重要。<br><br>
+      <strong>地图和资源下载。</strong>各种存档地图、材质包、皮肤在盒子内可以直接浏览和下载，形成了一个早期的"内容商城"。<br><br>
+      <strong>社区功能。</strong>盒子内置了聊天、动态分享、攻略教程等社区功能，将 MCBBS 和贴吧上的社区互动搬到了工具内部。
+    </p>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 8</span>
+    多玩我的世界盒子在巅峰时期（2015-2016年）用户数以千万计。虽然多玩官方从未公布精确数据，但根据多家游戏媒体报道，盒子的日活跃用户在高峰期超过百万，是当时中国最大的 Minecraft 聚合平台。
+  </div>
+
+  <div class="thesis-box fade-in">
+    <span class="thesis-label">关键判断</span>
+    <p>多玩盒子的本质，是一个"非官方的应用商店"。它完成了 Mojang/微软未能完成的工作——为中国玩家提供一个便捷的、本地化的内容分发平台。从产品逻辑上看，盒子已经预演了后来网易中国版的核心功能。</p>
+  </div>
+
+  <div class="china-card fade-in">
+    <span class="china-tag">🇨🇳 深层意义</span>
+    <h3>"盒子模式"的中国游戏史意义</h3>
+    <p>
+      多玩盒子不是孤例。在中国游戏市场上，类似的"第三方聚合工具"反复出现——从早期的魔兽对战平台（VS、浩方）到手游时代的第三方应用商店（豌豆荚、应用宝）。它们共同揭示了一个规律：<strong>当官方缺席或官方服务不到位时，中国市场会自发产生"替代性基础设施"</strong>。这些基础设施往往比官方更懂本地用户，但也面临着版权、质量和可持续性的挑战。
+    </p>
+  </div>
+</section>
+
+<!-- ==================== S6: 网易收编 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-gold"></div>
+  </div>
+</div>
+
+<section class="section" id="s6">
+  <div class="section-header">
+    <h2 class="section-title red">网易收编：从民间到官方</h2>
+    <p class="section-desc">2016-2017年，网易获得 Minecraft 中国独家代理权。一个"自下而上"的生态，开始被"自上而下"地重组。</p>
+  </div>
+
+  <p class="narrative fade-in">
+    2016年5月，网易宣布与 Mojang 达成合作，成为 Minecraft 中国大陆地区的独家代理商。2017年8月，PC Java 版开启测试；10月，手机版（基岩版）公测。一个标志性的事件是：<strong>多玩我的世界盒子在网易代理后逐步下线</strong>，其用户被引导至网易中国版。
+  </p>
+
+  <div class="arg-block red fade-in">
+    <h3>"收编"的三个层面</h3>
+    <p>
+      <strong>1. 版权层面的收编。</strong>网易通过法律手段要求第三方工具下架。多玩盒子、各类"启动器"和未经授权的服务器陆续关闭或转型。盗版传播渠道被大幅压缩，游戏进入"正版化"轨道。<br><br>
+      <strong>2. 功能层面的继承。</strong>网易中国版几乎"复制"了盒子的核心功能：组件中心（对应盒子的 Mod 管理）、联机大厅（对应盒子的多人联机）、资源商城（对应盒子的地图下载）。不同之处在于，网易将这些功能纳入了一个受控的商业框架中。<br><br>
+      <strong>3. 社区层面的迁移。</strong>MCBBS、贴吧等独立社区的流量被分流至网易官方社区。网易推出了自己的论坛、开发者平台和创作者激励计划，试图将社区活力纳入官方体系。
+    </p>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 9</span>
+    网易 Minecraft 中国版（mc.163.com）采用免费下载模式，大幅降低了入门门槛。PC Java 版于2017年8月开启测试，手机版于2017年10月公测。上线首月注册用户即突破3000万。<a href="https://mc.163.com/" target="_blank">mc.163.com</a>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 10</span>
+    网易中国版注册用户增长数据：2018年突破1亿，2019年突破3亿，2020年突破4亿，2022年突破6亿，2023年突破7亿，2025年突破8亿。这一增长速度远超国际版，使中国版成为全球最大的 Minecraft 玩家社区。<a href="https://mc.163.com/" target="_blank">mc.163.com</a>
+  </div>
+
+  <div class="china-card fade-in">
+    <span class="china-tag">🇨🇳 争议与反思</span>
+    <h3>"收编"的代价：社区创造力的保留还是消解？</h3>
+    <p>
+      网易的"收编"带来了明显的正面效果：正版化保护了玩家权益，统一的平台降低了碎片化，开发者激励计划让创作者获得收入。但也引发了争议：组件审核制度限制了 Mod 的自由度，商业化的内容推荐取代了社区自发的口碑传播，独立社区的衰落使得"去中心化"的讨论空间缩小。
+      一个核心问题是：<strong>当民间生态被"收编"后，那种自发的、野蛮生长的创造力还能存续吗？</strong>
+    </p>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 11</span>
+    网易 Minecraft 开发者平台（mc.163.com/dev/）为创作者提供组件开发工具和收入分成机制。截至2023年，已有数万名注册开发者，部分头部创作者通过组件销售获得了可观收入。这一模式将"用爱发电"转化为可持续的创作生态。<a href="https://mc.163.com/dev/" target="_blank">mc.163.com/dev/</a>
+  </div>
+</section>
+
+<!-- ==================== S7: 分析与结论 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-diamond"></div>
+  </div>
+</div>
+
+<section class="section" id="s7">
+  <div class="section-header">
+    <h2 class="section-title gold">分析与结论</h2>
+    <p class="section-desc">回到研究问题：Mod 社区到底如何"拯救"了 Minecraft 的中国？</p>
+  </div>
+
+  <div class="analysis-grid fade-in">
+    <div class="analysis-card c1">
+      <h3>发现一：Mod 社区 = 影子发行商</h3>
+      <p>
+        在官方缺席的六年里，Mod 社区承担了翻译、分发、教学、社交等全部"发行商职能"。这不是简单的"盗版传播"，而是一次完整的、自发的游戏本土化。Minecraft 在中国的成功，首先归功于这个"影子生态"的六年积累。
+      </p>
+    </div>
+    <div class="analysis-card c2">
+      <h3>发现二：开放架构是前提条件</h3>
+      <p>
+        如果没有 Java 的可反编译性、服务端的公开性、资源系统的可替换性，Mod 社区就不可能存在。Minecraft 的"开放架构"不是一个技术细节，而是一个<strong>战略性设计</strong>——它让游戏成为了一个"平台"，而平台才能催生社区。
+      </p>
+    </div>
+    <div class="analysis-card c3">
+      <h3>发现三："收编"是双刃剑</h3>
+      <p>
+        网易的收编实现了正版化和规模化（8亿用户），但也带来了自由度下降和社区去中心化的问题。这揭示了一个普遍性矛盾：<strong>民间生态的活力与官方运营的秩序之间存在张力</strong>。如何在"收编"的同时保留社区的创造力，是所有 UGC 平台面临的挑战。
+      </p>
+    </div>
+    <div class="analysis-card c4">
+      <h3>发现四：中国市场的"替代性基础设施"规律</h3>
+      <p>
+        Minecraft 的中国故事不是孤例。从魔兽对战平台到第三方应用商店，中国市场反复出现"官方缺席→民间替代→官方收编"的模式。这一规律对理解中国游戏产业的"另类生长"（课程第四讲）具有普遍意义。
+      </p>
+    </div>
+  </div>
+
+  <div class="thesis-box fade-in" style="margin-top: 2.5rem;">
+    <span class="thesis-label">最终结论</span>
+    <p>Minecraft 在中国的故事，不是一个"游戏公司成功开拓市场"的商业叙事，而是一个"玩家社区在官方缺席时自发建设生态，然后被官方收编"的社区叙事。Mod 社区不仅"拯救"了 Minecraft 在中国的传播，更重新定义了这款游戏在中国的意义——它不再只是一个游戏，而是一个创作平台、一个社交空间、一代人的数字童年。这个结论呼应了课程第九讲"闲暇、劳动与玩工"的讨论：玩家的"玩"本身就是一种"劳动"，而这种劳动在 Minecraft 的中国故事中，具有明确的历史价值。</p>
+  </div>
+
+  <div class="evidence fade-in" style="margin-top: 2rem;">
+    <span class="ev-num">证据 12</span>
+    B站上 Minecraft 相关视频的累计播放量达数百亿次。其中大量视频是 Mod 介绍、整合包评测、建筑教程等内容。这些内容创作者（UP主）构成了社区传播的核心引擎，他们的创作动力在网易"收编"前后经历了从"用爱发电"到"商业化激励"的转变。<a href="https://search.bilibili.com/all?keyword=minecraft%20mod" target="_blank">bilibili.com: Minecraft Mod 搜索</a>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 13</span>
+    Minecraft 全球销量于2023年突破3亿份，成为史上最畅销的电子游戏。但在中国市场，由于网易版免费模式，"销量"并非衡量其影响力的合适指标——8亿注册用户才是更准确的参照。<a href="https://www.minecraft.net/" target="_blank">minecraft.net</a>
+  </div>
+
+  <div class="evidence fade-in">
+    <span class="ev-num">证据 14</span>
+    Minecraft 中文 Wiki（zh.minecraft.wiki）的编辑历史和讨论页面记录了大量社区协作的痕迹。从词条创建到争议讨论，Wiki 本身就是社区"自组织"能力的缩影。<a href="https://zh.minecraft.wiki/" target="_blank">zh.minecraft.wiki</a>
+  </div>
+</section>
+
+<!-- ==================== S8: 参考文献 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-grass"></div>
+    <div class="mini-block block-dirt"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-dirt"></div>
+    <div class="mini-block block-grass"></div>
+  </div>
+</div>
+
+<section class="section" id="s8">
+  <div class="section-header">
+    <h2 class="section-title blue">参考文献</h2>
+    <p class="section-desc">本研究引用的主要信息来源。所有在线资源均于2026年9月核实可访问性。</p>
+  </div>
+
+  <div class="source-list fade-in">
+    <div class="source-group">
+      <h3>官方与平台来源</h3>
+      <div class="source-item">
+        <span class="src-num">[1]</span>
+        Minecraft 官方网站 — <a href="https://www.minecraft.net/" target="_blank">minecraft.net</a> — 游戏销量、版本更新等基础数据。
+      </div>
+      <div class="source-item">
+        <span class="src-num">[2]</span>
+        网易 Minecraft 中国版 — <a href="https://mc.163.com/" target="_blank">mc.163.com</a> — 中国版注册用户数据、运营策略、组件中心。
+      </div>
+      <div class="source-item">
+        <span class="src-num">[3]</span>
+        网易 Minecraft 开发者平台 — <a href="https://mc.163.com/dev/" target="_blank">mc.163.com/dev/</a> — 开发者生态、创作者激励计划。
+      </div>
+    </div>
+
+    <div class="source-group">
+      <h3>社区与技术来源</h3>
+      <div class="source-item">
+        <span class="src-num">[4]</span>
+        Bukkit 项目 GitHub 仓库 — <a href="https://github.com/Bukkit/Bukkit" target="_blank">github.com/Bukkit/Bukkit</a> — Mod 框架历史、贡献者数据。
+      </div>
+      <div class="source-item">
+        <span class="src-num">[5]</span>
+        MinecraftForge GitHub 仓库 — <a href="https://github.com/MinecraftForge/MinecraftForge" target="_blank">github.com/MinecraftForge/MinecraftForge</a> — Mod 加载框架、整合包技术基础。
+      </div>
+      <div class="source-item">
+        <span class="src-num">[6]</span>
+        SpigotMC 社区 — <a href="https://www.spigotmc.org/" target="_blank">spigotmc.org</a> — 服务端插件生态、社区规模。
+      </div>
+      <div class="source-item">
+        <span class="src-num">[7]</span>
+        Hypixel 网络 — <a href="https://hypixel.net/" target="_blank">hypixel.net</a> — 全球最大 MC 服务器、小游戏模式。
+      </div>
+      <div class="source-item">
+        <span class="src-num">[8]</span>
+        Minecraft 中文 Wiki — <a href="https://zh.minecraft.wiki/" target="_blank">zh.minecraft.wiki</a> — 中文知识库、社区协作记录。
+      </div>
+    </div>
+
+    <div class="source-group">
+      <h3>社区历史与存档</h3>
+      <div class="source-item">
+        <span class="src-num">[9]</span>
+        MCBBS Web Archive 存档 — <a href="https://web.archive.org/web/2024*/mcbbbs.net" target="_blank">web.archive.org/web/2024*/mcbbbs.net</a> — 中国最大 MC 论坛的历史快照（原站已于2024年关闭）。
+      </div>
+      <div class="source-item">
+        <span class="src-num">[10]</span>
+        百度 Minecraft 吧 — <a href="https://tieba.baidu.com/f?kw=minecraft" target="_blank">tieba.baidu.com/f?kw=minecraft</a> — 中文 MC 核心社区，关注人数300万+。
+      </div>
+      <div class="source-item">
+        <span class="src-num">[11]</span>
+        Bilibili Minecraft 内容 — <a href="https://search.bilibili.com/all?keyword=minecraft" target="_blank">bilibili.com</a> — MC 视频内容生态、UP主创作。
+      </div>
+    </div>
+
+    <div class="source-group">
+      <h3>课程关联</h3>
+      <div class="source-item">
+        <span class="src-num">[12]</span>
+        课程第四讲"中国游戏产业的另类生长" — 为本研究提供了中国游戏市场独特性的分析框架。
+      </div>
+      <div class="source-item">
+        <span class="src-num">[13]</span>
+        课程第九讲"闲暇、劳动与玩工" — 为本研究关于"玩家劳动"的讨论提供了理论视角。
+      </div>
+      <div class="source-item">
+        <span class="src-num">[14]</span>
+        课程第十三讲"反事实与历史模拟" — Minecraft 作为"沙盒建造"类游戏的代表，与反事实思维和历史模拟有深层关联。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="ground-deco"></div>
+
+<footer class="footer">
+  <p class="pixel-font" style="margin-bottom: 1rem;">MOD 社区如何拯救了 MINECRAFT 的中国？</p>
+  <p>Route A · 游戏史考据 · 课程作业</p>
+  <p style="margin-top: 1rem; font-size: 0.75rem; color: var(--stone-gray);">
+    本站为课程作业作品，Minecraft 是 Mojang Studios / Microsoft 的注册商标。<br>
+    内容基于公开资料研究，引用均标注来源。
+  </p>
+</footer>
+
+<!-- ==================== SCROLL ANIMATION ==================== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Smooth scroll for nav links
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>

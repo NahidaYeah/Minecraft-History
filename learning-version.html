@@ -1,0 +1,2306 @@
+<!--
+  ====================================================================
+  Minecraft 发展史 — 学习版（带详细注释）
+  ====================================================================
+
+  这是一个用于学习前端开发的教学版本。每一段代码都附有详细的中文注释，
+  解释"这是什么"、"为什么这样写"、"用了什么技术"。
+
+  适合人群：
+  - 有一定 HTML 基础，想学习现代 CSS 布局（Flexbox / Grid）的同学
+  - 想了解响应式设计、CSS 动画、CSS 变量等技术的同学
+  - 想看到一个完整单页网站是如何从零搭建起来的同学
+
+  技术栈：
+  - 纯 HTML + CSS + JavaScript（无任何框架）
+  - Google Fonts 外部字体
+  - 所有代码写在一个文件里（单页应用）
+
+  目录结构（本文件的组织方式）：
+  1. HTML 文档头部（DOCTYPE、meta、字体引入）
+  2. CSS 样式（<style> 标签内）
+     2.1  重置与基础变量
+     2.2  Hero 首屏区域
+     2.3  导航栏
+     2.4  通用 Section 样式
+     2.5  卡片网格（Intro / Reason / Pop / Era）
+     2.6  时间线（Timeline）
+     2.7  中国分支（Branch）
+     2.8  装饰元素（地面、里程碑框）
+     2.9  响应式媒体查询
+     2.10 动画与滚动条美化
+  3. HTML 页面结构（<body> 标签内）
+     3.1  Hero 首屏
+     3.2  导航栏
+     3.3  各内容 Section
+     3.4  页脚
+  4. JavaScript（<script> 标签内）
+     4.1  滚动动画（IntersectionObserver）
+     4.2  平滑滚动导航
+
+  提示：你可以用浏览器的"查找"功能（Ctrl+F）搜索"【知识点】"来快速定位教学注释。
+  ====================================================================
+-->
+
+
+<!--
+  【知识点】DOCTYPE 声明
+  <!DOCTYPE html> 告诉浏览器这是一个 HTML5 文档。
+  必须写在文件的第一行，否则浏览器可能进入"怪异模式"（Quirks Mode），
+  导致 CSS 渲染行为不一致。
+-->
+<!DOCTYPE html>
+
+<!--
+  【知识点】lang 属性
+  lang="zh-CN" 表示页面语言为简体中文。
+  作用：
+  1. 帮助搜索引擎理解页面语言
+  2. 帮助屏幕阅读器选择正确的发音
+  3. 影响浏览器默认的字体选择（中文字体 vs 英文字体）
+-->
+<html lang="zh-CN">
+
+<!--
+  【知识点】<head> 标签
+  <head> 里放的是"元信息"（metadata），不会直接显示在页面上，
+  但对浏览器、搜索引擎、社交媒体分享等非常重要。
+-->
+<head>
+
+  <!--
+    【知识点】字符编码
+    charset="UTF-8" 指定文件使用 UTF-8 编码。
+    UTF-8 能表示世界上几乎所有文字（包括中文、日文、emoji 等）。
+    如果不写这行，中文可能会显示为乱码。
+  -->
+  <meta charset="UTF-8">
+
+  <!--
+    【知识点】视口（Viewport）设置
+    这行代码是"响应式设计"的基础。它告诉移动浏览器：
+    - width=device-width  → 页面宽度 = 设备屏幕宽度
+    - initial-scale=1.0   → 初始缩放比例 = 100%
+
+    没有这行的话，手机浏览器会默认用一个 980px 宽的"虚拟视口"来渲染，
+    然后缩小到屏幕大小，导致文字非常小、需要手动缩放。
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!--
+    【知识点】<title> 标签
+    设置浏览器标签页上显示的文字，也是搜索引擎结果中的标题。
+    好的标题应该简洁、有描述性。
+  -->
+  <title>Minecraft 发展史 — 从一块方块到亿万人的世界</title>
+
+  <!--
+    【知识点】meta description
+    这段文字会出现在搜索引擎结果中（标题下方的那行灰色文字）。
+    虽然不直接影响排名，但好的描述能提高点击率。
+  -->
+  <meta name="description" content="Minecraft（我的世界）从2009年的 Cave Game 到全球最畅销游戏的完整发展历程，以及在中国市场的精彩故事。">
+
+  <!--
+    【知识点】字体预连接（preconnect）
+    <link rel="preconnect"> 让浏览器提前建立与字体服务器的连接。
+    这样当真正需要下载字体时，DNS 解析和 TCP 握手已经完成，
+    能节省 100~300ms 的加载时间。这是一种常见的性能优化手段。
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <!--
+    【知识点】Google Fonts 引入
+    这里引入了两个字体：
+    1. "Press Start 2P" — 像素风格字体，用于标题和装饰文字
+    2. "Noto Sans SC"   — 思源黑体，用于正文中文内容
+       wght@400;700;900 表示引入 Regular、Bold、Black 三个字重
+
+    display=swap 的含义：
+    在字体下载完成之前，先用系统默认字体显示文字（避免白屏）。
+    字体加载完后自动替换。这叫 "Font Display Swap" 策略。
+  -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+
+
+<!--
+  ====================================================================
+  CSS 样式部分
+  ====================================================================
+  所有样式都写在 <style> 标签里（内嵌样式），而不是单独的 .css 文件。
+  这样做的好处是只需要一个 HTML 文件就能运行，方便分享和部署。
+  对于大型项目，通常会把 CSS 拆分到独立文件中。
+-->
+<style>
+
+/* ====================================================================
+   2.1  重置（Reset）与 CSS 变量
+   ==================================================================== */
+
+/*
+  【知识点】CSS Reset（样式重置）
+  不同浏览器对 HTML 元素有各自的默认样式（比如 <h1> 有默认字号，
+  <ul> 有默认缩进）。这些默认值在不同浏览器间不一致。
+
+  这行代码的作用是：
+  - *           → 选中所有元素
+  - *::before   → 选中所有元素的"伪元素"（后面会讲）
+  - *::after    → 同上
+  - box-sizing: border-box → 让 width/height 包含 padding 和 border
+  - margin: 0; padding: 0 → 清除所有默认外边距和内边距
+
+  box-sizing: border-box 的好处：
+  如果你设置一个元素 width: 200px; padding: 20px;
+  默认情况下元素实际宽度 = 200 + 20*2 = 240px（padding 额外增加）
+  用 border-box 后，实际宽度仍然是 200px（padding 包含在 200px 内）
+  这让布局计算更直观。
+*/
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/*
+  【知识点】CSS 自定义属性（CSS Variables / Custom Properties）
+  :root 是 CSS 中的"根选择器"，匹配 <html> 元素。
+  在 :root 里定义的变量可以在整个页面的任何地方使用。
+
+  语法：--变量名: 值;
+  使用：var(--变量名)
+
+  好处：
+  1. 统一管理颜色——改一处，全站生效
+  2. 语义化——看到 --grass-top 就知道是"草方块顶部绿色"
+  3. 方便做主题切换（比如暗色/亮色模式）
+
+  这里的颜色都来自 Minecraft 游戏中的经典方块颜色：
+  - 草方块的绿色、泥土的棕色、石头的灰色
+  - 钻石的浅蓝色、金矿的黄色、红石的红色
+  - 末影人的紫色、下界的红色
+*/
+:root {
+  --grass-green: #5D9B37;   /* 草方块侧面绿色 */
+  --grass-top: #7CBD48;     /* 草方块顶部亮绿 */
+  --dirt-brown: #8B6914;    /* 泥土棕色 */
+  --dirt-dark: #6B4C12;     /* 深泥土色（用于阴影） */
+  --stone-gray: #7F7F7F;    /* 石头灰色 */
+  --stone-dark: #5A5A5A;    /* 深石头色 */
+  --sky-blue: #87CEEB;      /* 天空蓝 */
+  --sky-dark: #5BA3C9;      /* 深天蓝 */
+  --creeper-green: #47A147; /* 苦力怕绿 */
+  --ender-purple: #7B3F9E;  /* 末影紫 */
+  --nether-red: #AA3232;    /* 下界红 */
+  --gold: #FCDB05;          /* 金矿黄 */
+  --diamond: #5DECF5;       /* 钻石浅蓝 */
+  --redstone: #FF1A1A;      /* 红石红 */
+  --bg-dark: #1a1a2e;       /* 深色背景 */
+  --bg-darker: #0f0f1a;     /* 更深背景 */
+  --text-light: #e8e8e8;    /* 亮色文字 */
+  --text-muted: #a0a0b0;    /* 灰色文字（次要内容） */
+  --pixel-border: 4px;      /* 像素边框宽度 */
+}
+
+/*
+  【知识点】scroll-behavior: smooth
+  让页面内的锚点跳转（比如点击导航链接跳到某个 section）
+  变成平滑滚动，而不是瞬间跳转。
+  只需要一行 CSS 就能实现，不需要 JavaScript。
+*/
+html { scroll-behavior: smooth; }
+
+/*
+  【知识点】body 基础样式
+  body 是页面中所有可见内容的"容器"。
+  这里设置了全局的字体、背景色、文字颜色和行高。
+
+  line-height: 1.8 的含义：
+  行高 = 字号 × 1.8。如果字号是 16px，行高就是 28.8px。
+  1.8 倍行高对中文阅读来说比较舒适（中文笔画多，需要更多行间距）。
+
+  overflow-x: hidden 的含义：
+  禁止页面在水平方向出现滚动条。
+  防止某些元素意外超出屏幕宽度导致出现横向滚动。
+*/
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background-color: var(--bg-darker);
+  color: var(--text-light);
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+
+/* ====================================================================
+   2.2  像素字体工具类
+   ==================================================================== */
+
+/*
+  【知识点】工具类（Utility Class）
+  .pixel-font 是一个"工具类"——它不针对某个具体组件，
+  而是提供一个可复用的样式。在任何元素上加 class="pixel-font"
+  就能让它变成像素字体。
+
+  letter-spacing: 1px 让字符之间多 1px 间距，
+  像素字体加一点间距会更清晰可读。
+*/
+.pixel-font {
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 1px;
+}
+
+/*
+  【知识点】伪元素（::before / ::after）与 box-shadow 模拟像素边框
+  .pixel-border 展示了如何用 box-shadow 模拟"像素风格"的边框。
+
+  inset 关键词让 box-shadow 向内绘制（而不是向外扩散）。
+  通过在右下角加一个暗色阴影、左上角加一个亮色"阴影"，
+  模拟出像素游戏中常见的"立体边框"效果（类似 Windows 95 的按钮）。
+
+  注意：这个类在当前页面中定义了但没有实际使用，
+  它是作为一个"可复用组件"预留的。
+*/
+.pixel-border {
+  border: var(--pixel-border) solid;
+  border-image: none;
+  box-shadow:
+    inset calc(-1 * var(--pixel-border)) calc(-1 * var(--pixel-border)) 0 0 rgba(0,0,0,0.25),
+    inset var(--pixel-border) var(--pixel-border) 0 0 rgba(255,255,255,0.15);
+}
+
+
+/* ====================================================================
+   2.3  Hero 首屏区域
+   ==================================================================== */
+
+/*
+  【知识点】Flexbox 居中技巧
+  .hero 使用了经典的 Flexbox 垂直水平居中方案：
+  display: flex;
+  flex-direction: column;    → 子元素纵向排列
+  align-items: center;       → 水平居中
+  justify-content: center;   → 垂直居中
+  min-height: 100vh;         → 最小高度 = 视口高度（100% viewport height）
+
+  vh 单位：1vh = 视口高度的 1%。100vh 就是"整个屏幕那么高"。
+
+  position: relative 的作用：
+  给 ::before 伪元素的 absolute 定位提供一个"参考点"。
+*/
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(180deg, #1a0a2e 0%, #0d1b2a 40%, #1b2838 100%);
+  overflow: hidden;
+  padding: 2rem;
+}
+
+/*
+  【知识点】linear-gradient（线性渐变）
+  linear-gradient(180deg, 颜色1 位置1, 颜色2 位置2, ...)
+  180deg = 从上到下的方向（0deg = 从下到上，90deg = 从左到右）
+
+  这里从深紫色渐变到深蓝色，营造夜空的感觉。
+
+  【知识点】::before 伪元素
+  ::before 在元素内容之前插入一个"虚拟元素"。
+  必须有 content 属性（即使是空字符串 ''）。
+  配合 position: absolute 可以把它当作一个装饰层。
+
+  这里用 ::before 铺了一层"星空"效果：
+  - 用多个 radial-gradient 在不同位置画小白点（模拟星星）
+  - 用 animation 让这些星星闪烁
+
+  【知识点】radial-gradient（径向渐变）
+  radial-gradient(大小 形状 at 位置, 颜色1, 颜色2)
+  例如：radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,0.6), transparent)
+  意思是：在水平 10%、垂直 20% 的位置，画一个 2x2 像素的白色半透明圆点，
+  然后渐变到透明（所以只有一个点，不是一大片）。
+
+  pointer-events: none 让这层"星空"不会阻挡鼠标点击。
+*/
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 30% 50%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2px 2px at 50% 10%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2px 2px at 70% 40%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(2px 2px at 90% 60%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2px 2px at 15% 80%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2px 2px at 45% 70%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(2px 2px at 80% 85%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(3px 3px at 25% 35%, rgba(255,255,255,0.2), transparent),
+    radial-gradient(3px 3px at 65% 75%, rgba(255,255,255,0.2), transparent);
+  animation: twinkle 4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/*
+  【知识点】@keyframes 动画定义
+  @keyframes 定义一段动画的"关键帧"。
+  浏览器会自动补全两个关键帧之间的过渡效果。
+
+  twinkle 动画：
+  - 0%   → 透明度 0.6（星星暗一些）
+  - 100% → 透明度 1.0（星星亮一些）
+  来回交替，模拟星星闪烁。
+
+  使用方式：animation: 名称 时长 缓动函数 迭代次数 方向;
+  - 4s              → 一次动画 4 秒
+  - ease-in-out     → 开头和结尾慢，中间快（更自然）
+  - infinite        → 无限循环
+  - alternate       → 每次循环反向播放（0%→100%→0%→100%...）
+*/
+@keyframes twinkle {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/*
+  【知识点】clamp() 响应式字号
+  clamp(最小值, 首选值, 最大值)
+  font-size: clamp(1.5rem, 4vw, 3rem) 的意思是：
+  - 字号首选 4vw（视口宽度的 4%）
+  - 但不会小于 1.5rem
+  - 也不会大于 3rem
+
+  这样标题在大屏幕上很大，在小屏幕上自动缩小，
+  不需要写媒体查询就能实现"响应式字号"。
+
+  【知识点】text-shadow 文字阴影
+  text-shadow: 4px 4px 0 var(--dirt-dark)
+  在文字右下方 4px 处画一个纯色的"影子"，
+  配合像素字体，营造出文字"凸出屏幕"的立体效果。
+  这比模糊阴影（blur）更适合像素风格。
+*/
+.hero-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  color: var(--grass-top);
+  text-shadow:
+    4px 4px 0 var(--dirt-dark),
+    -1px -1px 0 rgba(0,0,0,0.5);
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+  line-height: 1.6;
+}
+
+.hero-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.6rem, 1.5vw, 0.9rem);
+  color: var(--gold);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+  line-height: 2;
+}
+
+.hero-desc {
+  max-width: 700px;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  position: relative;
+  z-index: 1;
+  margin-bottom: 3rem;
+}
+
+/*
+  【知识点】Flexbox 布局（水平排列方块）
+  .hero-blocks 用 Flexbox 把 5 个像素方块排成一行。
+  gap: 12px 设置方块之间的间距（这是 Flexbox 特有的属性，
+  比给每个方块加 margin 更简洁，且不会产生多余的外边距）。
+*/
+.hero-blocks {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
+}
+
+/*
+  【知识点】animation-delay（动画延迟）
+  5 个方块用同一个 float 动画，但通过 nth-child 给每个方块
+  设置不同的延迟时间（0s, 0.5s, 1s, 1.5s, 2s）。
+  效果：方块们不是同时上下浮动，而是"波浪式"地起伏。
+  这种技巧叫"动画错开"（staggered animation）。
+
+  :nth-child(n) 选择器匹配父元素的第 n 个子元素。
+*/
+.pixel-block {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  animation: float 3s ease-in-out infinite;
+}
+
+.pixel-block:nth-child(2) { animation-delay: 0.5s; }
+.pixel-block:nth-child(3) { animation-delay: 1s; }
+.pixel-block:nth-child(4) { animation-delay: 1.5s; }
+.pixel-block:nth-child(5) { animation-delay: 2s; }
+
+/*
+  【知识点】transform: translateY()
+  translateY(-12px) 让元素向上移动 12px。
+  配合 0% → 50% → 100% 的关键帧，
+  元素会在原位和上移 12px 之间来回移动，形成"漂浮"效果。
+
+  注意：transform 不会改变元素在文档流中的实际位置，
+  只是视觉上移动。所以不会影响其他元素的布局。
+*/
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/*
+  【知识点】用 CSS 渐变模拟像素方块
+  .block-grass（草方块）的实现特别巧妙：
+  - linear-gradient(180deg, 绿色 0%, 绿色 25%, 棕色 25%, 棕色 100%)
+  - 在 25% 的位置"硬切"——从绿色直接变成棕色
+  - 模拟了草方块"上面是草、下面是土"的外观
+
+  【知识点】inset box-shadow
+  inset 让阴影画在元素内部（而不是外部）。
+  - 右下角内阴影（暗色）→ 模拟光照产生的阴影
+  - 左上角内阴影（亮色）→ 模拟光照产生的高光
+  两个内阴影组合，让方块看起来有"立体感"。
+*/
+.block-grass {
+  background: linear-gradient(180deg, var(--grass-top) 0%, var(--grass-top) 25%, var(--dirt-brown) 25%, var(--dirt-brown) 100%);
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), inset 4px 4px 0 rgba(255,255,255,0.15);
+}
+
+.block-dirt {
+  background: var(--dirt-brown);
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), inset 4px 4px 0 rgba(255,255,255,0.15);
+}
+
+.block-stone {
+  background: var(--stone-gray);
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), inset 4px 4px 0 rgba(255,255,255,0.15);
+}
+
+.block-diamond {
+  background: var(--diamond);
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), inset 4px 4px 0 rgba(255,255,255,0.3);
+}
+
+.block-gold {
+  background: var(--gold);
+  box-shadow: inset -4px -4px 0 rgba(0,0,0,0.2), inset 4px 4px 0 rgba(255,255,255,0.3);
+}
+
+/*
+  【知识点】position: absolute 定位
+  .scroll-hint 用 absolute 定位固定在 Hero 区域的底部。
+  因为 .hero 有 position: relative，所以 absolute 的参考点就是 .hero。
+  bottom: 2rem 表示距离 .hero 底部 2rem。
+*/
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  animation: bounce 2s infinite;
+  z-index: 1;
+}
+
+/* bounce 动画：上下弹跳，提示用户可以向下滚动 */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+
+/* ====================================================================
+   2.4  导航栏
+   ==================================================================== */
+
+/*
+  【知识点】position: sticky（粘性定位）
+  sticky 是 relative 和 fixed 的"混合体"：
+  - 元素在正常位置显示（像 relative）
+  - 但当页面滚动到指定位置时，会"粘住"不动（像 fixed）
+
+  top: 0 表示：当元素滚动到距离视口顶部 0px 时，开始粘住。
+  效果：导航栏平时跟着页面滚动，滚到顶部时就固定在那里，
+  无论怎么向下滚动都能看到导航。
+
+  z-index: 100 确保导航栏始终在其他内容的"上方"。
+  z-index 值越大，层级越高。
+*/
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-dark);
+  border-bottom: 4px solid var(--grass-green);
+  padding: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+/*
+  【知识点】Flexbox 居中 + 自动换行
+  .nav-inner 用 Flexbox 排列导航链接。
+  justify-content: center → 水平居中
+  flex-wrap: wrap → 空间不够时自动换行（小屏幕适配）
+
+  max-width: 1200px + margin: 0 auto
+  这是一种常见的"居中限宽"技巧：
+  - max-width 限制最大宽度（防止在大屏幕上拉得太宽）
+  - margin: 0 auto 让元素在父容器中水平居中
+*/
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+/*
+  【知识点】transition（过渡动画）
+  transition: all 0.2s 让所有属性变化都在 0.2 秒内平滑过渡。
+  当鼠标悬停（:hover）时，颜色、背景等变化不是瞬间切换，
+  而是有一个短暂的渐变效果，看起来更流畅。
+
+  border-bottom: 3px solid transparent
+  预先设置一个透明色的底部边框，这样 hover 时改变边框颜色
+  不会导致元素尺寸跳动（因为边框空间已经预留了）。
+*/
+.nav-link {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 1rem 1.2rem;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: var(--grass-top);
+  background: rgba(93, 155, 55, 0.1);
+  border-bottom-color: var(--grass-top);
+}
+
+
+/* ====================================================================
+   2.5  通用 Section 样式
+   ==================================================================== */
+
+/*
+  每个内容区块（section）都用这个统一的样式：
+  - 限宽 1000px 并居中
+  - 上下内边距 4rem，左右 1.5rem
+*/
+.section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
+/*
+  【知识点】修饰类（Modifier Class）
+  .section-title.green / .blue / .gold 等是"修饰类"。
+  基础类 .section-title 定义通用样式，修饰类只改变颜色。
+  这种 BEM 变体的写法让样式可以灵活组合。
+
+  text-shadow 在这里给标题加了深色阴影，让彩色标题在深色背景上更突出。
+*/
+.section-title.green { color: var(--grass-top); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+.section-title.blue { color: var(--diamond); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+.section-title.gold { color: var(--gold); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+.section-title.purple { color: var(--ender-purple); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+.section-title.red { color: var(--redstone); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+
+.section-desc {
+  color: var(--text-muted);
+  font-size: 1rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+
+/* ====================================================================
+   2.6  卡片网格布局（CSS Grid）
+   ==================================================================== */
+
+/*
+  【知识点】CSS Grid 布局
+  CSS Grid 是专门用来做二维布局的工具（Flexbox 是一维的）。
+
+  display: grid → 启用 Grid 布局
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))
+  这是 Grid 最强大的用法之一，拆解如下：
+
+  repeat(自动填充, 每列的宽度规则)
+  - auto-fit → 自动计算能放多少列就放多少列
+  - minmax(200px, 1fr) → 每列最窄 200px，最宽平分剩余空间
+  - 1fr → "1 fraction"，即剩余空间的等份
+
+  效果：
+  - 屏幕宽 → 自动 4~5 列
+  - 屏幕窄 → 自动变成 2 列或 1 列
+  - 不需要写任何媒体查询就能响应式！
+
+  gap: 1.5rem → 行列之间的间距
+*/
+.intro-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/*
+  【知识点】rgba() 半透明背景
+  background: rgba(255,255,255,0.05)
+  rgba = Red, Green, Blue, Alpha（透明度）
+  0.05 = 5% 不透明度 → 几乎是全透明的白色
+  在深色背景上叠加一层微亮的白色，形成"卡片"的视觉层次。
+
+  【知识点】transition 多属性过渡
+  transition: transform 0.2s, border-color 0.2s
+  可以分别指定不同属性的过渡时间。
+  hover 时卡片上移 + 边框变色，两个变化同步进行。
+*/
+.intro-card {
+  background: rgba(255,255,255,0.05);
+  border: 3px solid rgba(255,255,255,0.1);
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.intro-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--grass-top);
+}
+
+.intro-card .card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+.intro-card .card-number {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.2rem;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.intro-card .card-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+
+/* ====================================================================
+   2.7  时间线（Timeline）
+   ==================================================================== */
+
+/*
+  【知识点】用 ::before 伪元素画时间线的"中轴线"
+  .timeline::before 用绝对定位画了一条 4px 宽的竖线，
+  贯穿整个时间线的顶部到底部。
+
+  repeating-linear-gradient 创建重复渐变：
+  - 绿色 0~8px → 棕色 8~16px → 绿色 16~24px → ...
+  交替出现，模拟 Minecraft 中"草方块+泥土"的条纹效果。
+
+  left: 50% + transform: translateX(-50%)
+  这是一种让元素"精确居中"的技巧：
+  - left: 50% 让元素的左边缘在 50% 位置
+  - translateX(-50%) 再向左移动自身宽度的一半
+  - 结果：元素的中心线正好在 50% 位置
+*/
+.timeline {
+  position: relative;
+  padding: 2rem 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: repeating-linear-gradient(
+    180deg,
+    var(--grass-green) 0px,
+    var(--grass-green) 8px,
+    var(--dirt-brown) 8px,
+    var(--dirt-brown) 16px
+  );
+  transform: translateX(-50%);
+}
+
+/*
+  【知识点】:nth-child(odd/even) 奇偶选择器
+  时间线的每个条目交替出现在中轴线的左右两侧：
+  - 奇数项（1, 3, 5...）→ 在左边，文字右对齐
+  - 偶数项（2, 4, 6...）→ 在右边，文字左对齐
+
+  每个条目宽度 50%，正好占一半：
+  - 奇数项 left: 0 → 占据左半部分
+  - 偶数项 left: 50% → 占据右半部分
+
+  这样就形成了经典的"左右交替时间线"布局。
+*/
+.tl-item {
+  position: relative;
+  width: 50%;
+  padding: 1rem 2.5rem 2rem;
+}
+
+.tl-item:nth-child(odd) {
+  left: 0;
+  text-align: right;
+  padding-right: 3rem;
+}
+
+.tl-item:nth-child(even) {
+  left: 50%;
+  text-align: left;
+  padding-left: 3rem;
+}
+
+/*
+  【知识点】时间线上的"圆点"
+  .tl-dot 用绝对定位放在中轴线上。
+  奇数项的圆点在右边（right: -10px），
+  偶数项的圆点在左边（left: -10px），
+  正好骑在中轴线上。
+
+  不同的修饰类（highlight, blue, purple, red）给圆点不同的颜色，
+  用来标记不同类型的事件（重要里程碑、中国版事件等）。
+
+  box-shadow 给圆点加了发光效果，让重要节点更醒目。
+*/
+.tl-dot {
+  position: absolute;
+  top: 1.5rem;
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--grass-top);
+  background: var(--bg-darker);
+  z-index: 2;
+}
+
+.tl-item:nth-child(odd) .tl-dot {
+  right: -10px;
+}
+
+.tl-item:nth-child(even) .tl-dot {
+  left: -10px;
+}
+
+.tl-dot.highlight {
+  background: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(252, 219, 5, 0.5);
+}
+
+.tl-dot.blue {
+  border-color: var(--diamond);
+  background: var(--diamond);
+  box-shadow: 0 0 12px rgba(93, 236, 245, 0.4);
+}
+
+.tl-dot.purple {
+  border-color: var(--ender-purple);
+  background: var(--ender-purple);
+  box-shadow: 0 0 12px rgba(123, 63, 158, 0.5);
+}
+
+.tl-dot.red {
+  border-color: var(--redstone);
+  background: var(--redstone);
+  box-shadow: 0 0 12px rgba(255, 26, 26, 0.4);
+}
+
+/* 时间线卡片内容区域 */
+.tl-content {
+  background: rgba(255,255,255,0.04);
+  border: 3px solid rgba(255,255,255,0.08);
+  padding: 1.2rem 1.5rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.tl-content:hover {
+  border-color: var(--grass-green);
+  transform: scale(1.02);
+}
+
+/* 时间线中的年份、标题、版本号、正文 */
+.tl-year {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.tl-title {
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+  color: #fff;
+}
+
+.tl-version {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: var(--diamond);
+  background: rgba(93, 236, 245, 0.1);
+  display: inline-block;
+  padding: 2px 8px;
+  margin-bottom: 0.5rem;
+}
+
+.tl-text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+
+/* ====================================================================
+   2.8  兴起原因卡片 & 流行表现卡片
+   ==================================================================== */
+
+/*
+  这两组卡片的布局和前面的 intro-grid 类似，
+  但有一些视觉上的差异：
+  - reason-card 用 ::before 伪元素在顶部画了一条彩色线
+  - 每张卡片的顶部线颜色不同（通过 nth-child 区分）
+  这种"顶部彩色线"的设计模式在很多现代网站中都能看到。
+*/
+.reason-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.reason-card {
+  background: rgba(255,255,255,0.04);
+  border: 3px solid rgba(255,255,255,0.08);
+  padding: 1.8rem;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+/*
+  【知识点】::before 伪元素做装饰线
+  这里用 ::before 在卡片顶部创建一条 4px 高的色带。
+  position: absolute + top/left/right: 0 让它铺满整个宽度。
+  overflow: hidden 在父元素上确保色带不会超出卡片圆角（如果有的话）。
+*/
+.reason-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--grass-green);
+}
+
+/* 第 2、3、4 张卡片分别用不同颜色 */
+.reason-card:nth-child(2)::before { background: var(--diamond); }
+.reason-card:nth-child(3)::before { background: var(--gold); }
+.reason-card:nth-child(4)::before { background: var(--ender-purple); }
+
+.reason-card:hover {
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-4px);
+}
+
+.reason-card .reason-icon {
+  font-size: 2rem;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+.reason-card h3 {
+  font-weight: 900;
+  font-size: 1.05rem;
+  margin-bottom: 0.6rem;
+  color: #fff;
+}
+
+.reason-card p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* 流行表现卡片 —— 更紧凑的居中布局 */
+.pop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+
+.pop-card {
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(255,255,255,0.08);
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.pop-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-3px);
+}
+
+.pop-card .pop-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.pop-card .pop-number {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.9rem;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.pop-card .pop-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+
+/* ====================================================================
+   2.9  章节分隔装饰
+   ==================================================================== */
+
+/*
+  .chapter-divider 是章节之间的装饰性分隔线。
+  里面放了一排小方块（mini-block），视觉上呼应 Minecraft 的方块主题。
+*/
+.chapter-divider {
+  text-align: center;
+  padding: 3rem 1rem;
+  position: relative;
+}
+
+.chapter-divider .pixel-art-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.chapter-divider .mini-block {
+  width: 16px;
+  height: 16px;
+}
+
+
+/* ====================================================================
+   2.10  时代卡片（Era Cards）
+   ==================================================================== */
+
+/*
+  era-card 和 reason-card 的结构类似，
+  但用于展示不同"时代"的信息，带有彩色顶部线和列表内容。
+  颜色修饰类（green, blue, purple, gold, red）同时影响
+  顶部线颜色和标题颜色。
+*/
+.era-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.era-card {
+  background: rgba(255,255,255,0.04);
+  border: 3px solid rgba(255,255,255,0.08);
+  padding: 2rem;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.era-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.era-card.green::before { background: var(--grass-green); }
+.era-card.blue::before { background: var(--diamond); }
+.era-card.purple::before { background: var(--ender-purple); }
+.era-card.gold::before { background: var(--gold); }
+.era-card.red::before { background: var(--redstone); }
+
+.era-card:hover {
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-4px);
+}
+
+.era-card h3 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
+.era-card.green h3 { color: var(--grass-top); }
+.era-card.blue h3 { color: var(--diamond); }
+.era-card.purple h3 { color: var(--ender-purple); }
+.era-card.gold h3 { color: var(--gold); }
+.era-card.red h3 { color: var(--redstone); }
+
+/*
+  【知识点】自定义列表样式
+  先用 list-style: none 去掉默认的圆点标记，
+  再用 li::before 伪元素插入自定义标记（▸ 三角形）。
+  这是比默认圆点更灵活的列表样式方案。
+*/
+.era-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.era-card li {
+  padding: 0.4rem 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.era-card li::before {
+  content: '▸ ';
+  color: var(--grass-green);
+}
+
+
+/* ====================================================================
+   2.11  中国分支（Branch）样式
+   ==================================================================== */
+
+/*
+  中国分支是主时间线的"支线"，用红色（redstone）作为主题色，
+  与主时间线的绿色形成视觉区分。
+
+  .china-banner 是一个全宽的提示横幅，
+  用渐变背景 + 红色边框来突出"中国分支"的区域。
+*/
+.china-banner {
+  background: linear-gradient(135deg, rgba(170, 50, 50, 0.15), rgba(252, 219, 5, 0.1));
+  border: 3px solid rgba(170, 50, 50, 0.3);
+  padding: 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  border-radius: 0;
+}
+
+.china-banner p {
+  font-size: 1rem;
+  color: var(--text-muted);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/*
+  .tl-branch 是支线时间线条目。
+  结构和 .tl-item 类似，但多了一条"连接线"（.tl-branch-line）
+  把支线卡片和主时间线中轴线连起来。
+
+  连接线用 repeating-linear-gradient 画成虚线样式，
+  模拟红石信号的视觉效果。
+*/
+.tl-branch {
+  position: relative;
+  width: 50%;
+  padding: 0 2.5rem 1.5rem;
+}
+
+.tl-branch:nth-child(odd) {
+  left: 0;
+  text-align: right;
+  padding-right: 3rem;
+}
+
+.tl-branch:nth-child(even) {
+  left: 50%;
+  text-align: left;
+  padding-left: 3rem;
+}
+
+.tl-branch .tl-branch-line {
+  position: absolute;
+  top: 1.5rem;
+  width: 40px;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--redstone) 0px,
+    var(--redstone) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+.tl-branch:nth-child(odd) .tl-branch-line {
+  right: -40px;
+}
+
+.tl-branch:nth-child(even) .tl-branch-line {
+  left: -40px;
+}
+
+/*
+  支线卡片用 border-left（或 border-right）4px 实线
+  来强调"这是中国分支的内容"。
+  奇数项的粗线在右边，偶数项的粗线在左边。
+*/
+.tl-branch .tl-branch-card {
+  background: rgba(170, 50, 50, 0.06);
+  border: 2px solid rgba(170, 50, 50, 0.25);
+  border-left: 4px solid var(--redstone);
+  padding: 0.8rem 1.1rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.tl-branch:nth-child(odd) .tl-branch-card {
+  border-left: 2px solid rgba(170, 50, 50, 0.25);
+  border-right: 4px solid var(--redstone);
+}
+
+.tl-branch .tl-branch-card:hover {
+  border-color: var(--redstone);
+  transform: scale(1.02);
+}
+
+.tl-branch:nth-child(odd) .tl-branch-card:hover {
+  border-color: var(--redstone);
+}
+
+.tl-branch .branch-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  color: var(--redstone);
+  background: rgba(255, 26, 26, 0.1);
+  display: inline-block;
+  padding: 2px 6px;
+  margin-bottom: 0.3rem;
+}
+
+.tl-branch .branch-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+  margin-bottom: 0.3rem;
+}
+
+.tl-branch .branch-text {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+
+/* ====================================================================
+   2.12  里程碑高亮框
+   ==================================================================== */
+
+/*
+  .milestone-box 用于强调重要的里程碑信息。
+  用金色边框 + 渐变背景让它在一众暗色卡片中"跳出来"。
+*/
+.milestone-box {
+  background: linear-gradient(135deg, rgba(252, 219, 5, 0.08), rgba(93, 236, 245, 0.05));
+  border: 3px solid var(--gold);
+  padding: 2rem;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.milestone-box .pixel-font {
+  font-size: 0.7rem;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+
+/* ====================================================================
+   2.13  地面装饰 & 页脚
+   ==================================================================== */
+
+/*
+  【知识点】repeating-linear-gradient 做像素地面
+  .ground-deco 用两组重复渐变模拟 Minecraft 的地面：
+  - 上层：交替的草方块绿色（两种绿色交替）
+  - 下层（::after）：交替的泥土棕色（两种棕色交替）
+
+  repeating-linear-gradient(90deg, ...) 中的 90deg = 从左到右。
+  每 32px 一个循环，形成方块状的条纹。
+*/
+.ground-deco {
+  height: 32px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--grass-green) 0px,
+      var(--grass-green) 32px,
+      var(--grass-top) 32px,
+      var(--grass-top) 64px
+    );
+  position: relative;
+}
+
+.ground-deco::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--dirt-brown) 0px,
+      var(--dirt-brown) 32px,
+      var(--dirt-dark) 32px,
+      var(--dirt-dark) 64px
+    );
+}
+
+.footer {
+  text-align: center;
+  padding: 3rem 1rem;
+  border-top: 4px solid var(--grass-green);
+  background: var(--bg-dark);
+}
+
+.footer p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.footer .pixel-font {
+  font-size: 0.5rem;
+  color: var(--grass-green);
+}
+
+
+/* ====================================================================
+   2.14  响应式设计（Media Queries）
+   ==================================================================== */
+
+/*
+  【知识点】@media 媒体查询
+  @media (max-width: 768px) { ... }
+  意思是：当视口宽度 ≤ 768px（通常是平板和手机）时，
+  应用大括号里的样式。
+
+  这是"响应式设计"的核心技术。
+  基本思路：先为桌面端写样式，再用媒体查询为小屏幕"覆盖"部分样式。
+  这叫 "Mobile-first" 或 "Desktop-first"（这里是 Desktop-first）。
+
+  在 768px 以下，时间线的变化最关键：
+  - 中轴线从中间移到左边（left: 20px）
+  - 所有条目变成 100% 宽度，左对齐
+  - 圆点也统一放在左边
+  这样时间线在手机上就变成了"单侧布局"，避免内容太挤。
+
+  !important 的使用：
+  这里用 !important 来强制覆盖前面的样式。
+  通常不推荐滥用 !important，但在响应式覆盖中，
+  它可以确保小屏幕样式不被前面的规则覆盖。
+*/
+@media (max-width: 768px) {
+  .timeline::before {
+    left: 20px;
+  }
+
+  .tl-item {
+    width: 100%;
+    padding-left: 3.5rem !important;
+    padding-right: 1rem !important;
+    text-align: left !important;
+    left: 0 !important;
+  }
+
+  .tl-dot {
+    left: 10px !important;
+    right: auto !important;
+  }
+
+  .nav-link {
+    font-size: 0.45rem;
+    padding: 0.8rem 0.6rem;
+  }
+
+  .hero-blocks {
+    gap: 8px;
+  }
+
+  .pixel-block {
+    width: 36px;
+    height: 36px;
+  }
+
+  .intro-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* 中国分支在小屏幕下也变成单侧布局 */
+  .tl-branch {
+    width: 100%;
+    padding-left: 3.5rem !important;
+    padding-right: 1rem !important;
+    text-align: left !important;
+    left: 0 !important;
+  }
+
+  .tl-branch .tl-branch-line {
+    left: 20px !important;
+    right: auto !important;
+    width: 24px;
+  }
+
+  .tl-branch:nth-child(odd) .tl-branch-card {
+    border-left: 4px solid var(--redstone);
+    border-right: 2px solid rgba(170, 50, 50, 0.25);
+  }
+}
+
+/* 更小的屏幕（手机竖屏） */
+@media (max-width: 480px) {
+  .intro-grid {
+    grid-template-columns: 1fr;  /* 卡片变成单列 */
+  }
+
+  /* 导航栏在小屏幕上可以横向滚动 */
+  .nav-inner {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;  /* iOS 上的惯性滚动 */
+  }
+}
+
+
+/* ====================================================================
+   2.15  滚动入场动画
+   ==================================================================== */
+
+/*
+  【知识点】CSS 过渡 + JavaScript 类名切换 = 滚动动画
+  .fade-in 元素初始状态：透明（opacity: 0）且向下偏移 20px。
+  当 JavaScript 检测到元素进入视口时，给它加上 .visible 类，
+  触发 transition 过渡到 opacity: 1 和 translateY(0)。
+
+  这种"CSS 定义动画状态 + JS 控制触发"的模式非常常见，
+  比纯 JS 动画性能更好（因为 CSS transition 可以用 GPU 加速）。
+*/
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ====================================================================
+   2.16  自定义滚动条
+   ==================================================================== */
+
+/*
+  【知识点】WebKit 滚动条自定义
+  ::-webkit-scrollbar 等伪元素可以自定义 Chrome/Safari 的滚动条样式。
+  注意：这只在 WebKit 内核浏览器中有效，Firefox 需要用 scrollbar-width 等属性。
+
+  这里把滚动条改成了绿色（草方块色），和主题一致。
+*/
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--grass-green);
+  border: 2px solid var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--grass-top);
+}
+
+</style>
+</head>
+
+<!--
+  ====================================================================
+  HTML 页面结构部分
+  ====================================================================
+  整个页面的 HTML 结构是"语义化"的：
+  - <section> 表示一个独立的内容区块
+  - <nav> 表示导航区域
+  - <footer> 表示页脚
+  - <h1>/<h2> 表示标题层级
+
+  语义化 HTML 的好处：
+  1. 搜索引擎更容易理解页面结构（SEO 友好）
+  2. 屏幕阅读器能更好地朗读页面
+  3. 代码可读性更好，维护更方便
+-->
+<body>
+
+<!-- ==================== Hero 首屏 ==================== -->
+<!--
+  首屏是用户打开页面看到的第一屏内容。
+  这里用 <section> 标签包裹，id="top" 可以作为锚点跳转的目标。
+-->
+<section class="hero" id="top">
+
+  <!-- 5 个 CSS 像素方块，用 float 动画做漂浮效果 -->
+  <div class="hero-blocks">
+    <div class="pixel-block block-grass"></div>    <!-- 草方块 -->
+    <div class="pixel-block block-dirt"></div>     <!-- 泥土方块 -->
+    <div class="pixel-block block-stone"></div>    <!-- 石头方块 -->
+    <div class="pixel-block block-diamond"></div>  <!-- 钻石方块 -->
+    <div class="pixel-block block-gold"></div>     <!-- 金矿方块 -->
+  </div>
+
+  <!-- 主标题（像素字体 + 文字阴影） -->
+  <h1 class="hero-title">Minecraft 发展史</h1>
+
+  <!-- 副标题 -->
+  <p class="hero-subtitle">从一块方块到亿万人的世界</p>
+
+  <!-- 简介文字 -->
+  <p class="hero-desc">
+    从2009年一个人用 Java 写出的 Cave Game，到如今全球销量超3亿份的现象级沙盒游戏——
+    这是一段关于创造力、社区与无限可能的传奇故事。
+  </p>
+
+  <!-- 底部滚动提示（bounce 动画） -->
+  <div class="scroll-hint pixel-font">▼ 向下滚动探索 ▼</div>
+</section>
+
+<!-- ==================== 导航栏 ==================== -->
+<!--
+  <nav> 是语义化的导航标签。
+  里面的 <a> 链接通过 href="#id" 指向页面中的各个 section。
+  点击后页面会平滑滚动到对应位置（由 CSS scroll-behavior: smooth 实现）。
+-->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="#overview" class="nav-link">概览</a>
+    <a href="#why" class="nav-link">兴起原因</a>
+    <a href="#popularity" class="nav-link">流行表现</a>
+    <a href="#origin" class="nav-link">创世起源</a>
+    <a href="#golden" class="nav-link">黄金时代</a>
+    <a href="#microsoft" class="nav-link">微软时代</a>
+    <a href="#modern" class="nav-link">现代更新</a>
+    <a href="#legacy" class="nav-link">文化遗产</a>
+  </div>
+</nav>
+
+<!-- 地面装饰条（纯装饰，无实际内容） -->
+<div class="ground-deco"></div>
+
+<!-- ==================== 数据概览 ==================== -->
+<!--
+  用 4 张卡片展示关键数据。
+  class="fade-in" 让这个区域在滚动到视口时触发入场动画。
+-->
+<section class="section" id="overview">
+  <div class="section-header">
+    <h2 class="section-title green">数据概览</h2>
+    <p class="section-desc">Minecraft 用十余年时间，从独立开发者的实验项目成长为全球最具影响力的游戏之一。</p>
+  </div>
+  <div class="intro-grid fade-in">
+    <div class="intro-card">
+      <span class="card-icon">⛏️</span>
+      <span class="card-number">2009</span>
+      <span class="card-label">最初版本诞生</span>
+    </div>
+    <div class="intro-card">
+      <span class="card-icon">🌍</span>
+      <span class="card-number">3亿+</span>
+      <span class="card-label">全球销量（截至2023）</span>
+    </div>
+    <div class="intro-card">
+      <span class="card-icon">👥</span>
+      <span class="card-number">1.7亿+</span>
+      <span class="card-label">月活跃玩家</span>
+    </div>
+    <div class="intro-card">
+      <span class="card-icon">🇨🇳</span>
+      <span class="card-number">8亿+</span>
+      <span class="card-label">中国版注册用户</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 兴起原因 ==================== -->
+<!-- 章节分隔装饰 -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-grass"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-grass"></div>
+  </div>
+</div>
+
+<section class="section" id="why">
+  <div class="section-header">
+    <h2 class="section-title green">为什么 Minecraft 能兴起？</h2>
+    <p class="section-desc">一个画面"简陋"的方块游戏，凭什么征服全球？答案藏在它的设计哲学、社区生态和时代机遇之中。</p>
+  </div>
+
+  <!-- 4 张原因卡片 -->
+  <div class="reason-grid fade-in">
+    <div class="reason-card">
+      <span class="reason-icon">🧱</span>
+      <h3>极致的自由度</h3>
+      <p>没有固定的目标和线性流程——玩家可以建造城堡、编写电路、探索洞穴、饲养动物，甚至用红石造出一台计算机。游戏只提供工具，乐趣由玩家自己定义。这种"你想怎么玩就怎么玩"的设计，让每个人都能找到属于自己的乐趣。</p>
+    </div>
+    <div class="reason-card">
+      <span class="reason-icon">🎬</span>
+      <h3>内容创作者的推动</h3>
+      <p>YouTube 和 B站 上的 Minecraft 视频是游戏爆发的核心引擎。Let's Play、建筑教程、红石机械、模组介绍——创作者们不断产出新鲜内容，形成"看视频→想玩→自己创作→分享"的正向循环。PewDiePie、Dream 等创作者的 MC 视频累计播放量达数百亿次。</p>
+    </div>
+    <div class="reason-card">
+      <span class="reason-icon">🧩</span>
+      <h3>模组与社区的无限扩展</h3>
+      <p>Forge、Fabric 等模组框架让社区可以为游戏添加几乎任何功能——工业、魔法、科技、冒险、精灵宝可梦……模组让 Minecraft 不再只是一款游戏，而是一个无限扩展的平台。数以万计的模组、地图、材质包让游戏内容永远不枯竭。</p>
+    </div>
+    <div class="reason-card">
+      <span class="reason-icon">🤝</span>
+      <h3>低门槛与高上限</h3>
+      <p>像素化的方块画面让硬件要求极低，几乎任何电脑都能运行；简单的放置和破坏方块操作连小朋友都能上手。但深入后，红石电路、命令方块、数据包、模组开发的复杂度可以媲美专业编程——这种"易学难精"的设计让各年龄段、各水平的玩家都能沉浸其中。</p>
+    </div>
+  </div>
+
+  <!-- 里程碑高亮框 -->
+  <div class="milestone-box fade-in" style="margin-top: 2.5rem;">
+    <span class="pixel-font">时代机遇</span>
+    <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.8; max-width: 750px; margin-left: auto; margin-right: auto;">
+      Minecraft 的崛起恰逢互联网视频平台（YouTube 2005年成立）和社交媒体的高速发展期。独立游戏文化在 2010 年代初期兴起，玩家开始追求"小而美"的创新体验，而非传统 3A 大作。Minecraft 以 Early Access 模式售卖，让玩家直接参与游戏开发过程，这种模式后来成为独立游戏的标杆。
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 流行表现 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-gold"></div>
+  </div>
+</div>
+
+<section class="section" id="popularity">
+  <div class="section-header">
+    <h2 class="section-title gold">流行的表现</h2>
+    <p class="section-desc">Minecraft 的影响力远超游戏本身——从销售纪录到文化符号，从课堂教育到电竞舞台，它无处不在。</p>
+  </div>
+
+  <!-- 8 张数据卡片 -->
+  <div class="pop-grid fade-in">
+    <div class="pop-card">
+      <span class="pop-icon">🏆</span>
+      <span class="pop-number">3亿+</span>
+      <span class="pop-label">全球累计销量<br>史上最畅销电子游戏</span>
+    </div>
+    <div class="pop-card">
+      <span class="pop-icon">📺</span>
+      <span class="pop-number">万亿级</span>
+      <span class="pop-label">YouTube 累计播放量<br>MC 相关内容全球第一</span>
+    </div>
+    <div class="pop-card">
+      <span class="pop-icon">🎮</span>
+      <span class="pop-number">1.7亿+</span>
+      <span class="pop-label">月活跃玩家<br>覆盖几乎所有国家</span>
+    </div>
+    <div class="pop-card">
+      <span class="pop-icon">🎪</span>
+      <span class="pop-number">MINECON</span>
+      <span class="pop-label">年度全球玩家盛会<br>数万人现场参与</span>
+    </div>
+    <div class="pop-card">
+      <span class="pop-icon">🎓</span>
+      <span class="pop-number">100+国家</span>
+      <span class="pop-label">教育版进入课堂<br>教授编程、建筑、历史</span>
+    </div>
+    <div class="pop-card">
+      <span class="pop-icon">💚</span>
+      <span class="pop-number">苦力怕</span>
+      <span class="pop-label">成为流行文化符号<br>出现在周边、联名、表情包中</span>
+    </div>
+    <div class="pop-card">
+      <span class="pop-icon">🏗️</span>
+      <span class="pop-number">建筑奇迹</span>
+      <span class="pop-label">玩家1:1复刻故宫、地球<br>等真实建筑震撼世界</span>
+    </div>
+    <div class="pop-card">
+      <span class="pop-icon">🤖</span>
+      <span class="pop-number">红石科技</span>
+      <span class="pop-label">玩家在游戏中造出<br>计算器、甚至CPU</span>
+    </div>
+  </div>
+
+  <div class="milestone-box fade-in" style="margin-top: 2.5rem;">
+    <span class="pixel-font">超越游戏</span>
+    <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.8; max-width: 750px; margin-left: auto; margin-right: auto;">
+      Minecraft 被联合国用于城市规划项目，被 NASA 用于火星地形建模，被博物馆用于还原历史场景。它证明了游戏不仅是娱乐——更是一种创作工具、教育媒介和社交平台。在中国，Minecraft 成为 00 后和 10 后的"集体记忆"，是一代人的数字童年。
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 创世起源 ==================== -->
+<section class="section" id="origin">
+  <div class="section-header">
+    <h2 class="section-title green">创世起源 · 2009–2011</h2>
+    <p class="section-desc">一个人、一台电脑、一个改变世界的想法。Markus "Notch" Persson 用 Java 编写了一个名为 Cave Game 的小程序，谁也没想到这会开启一个时代。</p>
+  </div>
+
+  <!--
+    【知识点】时间线 HTML 结构
+    每个 .tl-item 是一个时间线条目，包含：
+    - .tl-dot    → 中轴线上的圆点
+    - .tl-content → 内容卡片
+      - .tl-year    → 年份（像素字体）
+      - .tl-title   → 事件标题
+      - .tl-version → 版本号标签
+      - .tl-text    → 描述文字
+  -->
+  <div class="timeline">
+    <div class="tl-item fade-in">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-content">
+        <span class="tl-year">2009年5月</span>
+        <div class="tl-title">Cave Game 诞生</div>
+        <span class="tl-version">Pre-Classic</span>
+        <p class="tl-text">Markus "Notch" Persson 受《Infiminer》《Dwarf Fortress》等游戏启发，花了约一周时间开发了一款 3D 方块建造游戏，最初命名为 "Cave Game"，后改名为 "Minecraft: Order of the Stone"，最终简化为 Minecraft。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <span class="tl-year">2009年5月17日</span>
+        <div class="tl-title">Classic 版本公开发布</div>
+        <span class="tl-version">Classic 0.0.1a</span>
+        <p class="tl-text">Minecraft Classic 在 TIGSource 论坛首次公开，玩家可以放置和破坏方块进行建造。这个免费版本迅速在独立游戏社区中传播开来。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <span class="tl-year">2010年6月30日</span>
+        <div class="tl-title">Alpha 版本开始售卖</div>
+        <span class="tl-version">Alpha 1.0</span>
+        <p class="tl-text">Minecraft 进入 Alpha 阶段，售价 €9.95。加入了生存模式、合成系统、昼夜循环、植物生长等核心机制。Notch 辞去日常工作，全职投入 Minecraft 开发，成立了 Mojang Specifications 公司。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <span class="tl-year">2010年12月20日</span>
+        <div class="tl-title">Beta 版本发布</div>
+        <span class="tl-version">Beta 1.0</span>
+        <p class="tl-text">游戏进入 Beta 阶段，销量突破100万份。加入了红石电路、矿车、船等交通系统，以及新的生物群系。社区模组文化开始萌芽。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-content">
+        <span class="tl-year">2011年11月18日</span>
+        <div class="tl-title">Minecraft 1.0 正式版发布！</div>
+        <span class="tl-version">Adventure Update</span>
+        <p class="tl-text">在 MINECON 2011 上，Minecraft 正式发布 1.0 版本。末影龙作为最终 Boss 登场末地维度，信标、经验值系统、极限模式等加入。发售仅半天，销量即突破100万份。这一天标志着 Minecraft 从独立游戏正式迈入主流视野。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 黄金时代 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-grass"></div>
+    <div class="mini-block block-dirt"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-dirt"></div>
+    <div class="mini-block block-grass"></div>
+  </div>
+</div>
+
+<section class="section" id="golden">
+  <div class="section-header">
+    <h2 class="section-title gold">黄金时代 · 2012–2014</h2>
+    <p class="section-desc">Minecraft 成为全球文化现象。YouTube 上的 Let's Play 视频推动了爆炸式增长，游戏内容也在不断丰富。</p>
+  </div>
+
+  <!-- 时代卡片（Grid 布局） -->
+  <div class="era-grid fade-in">
+    <div class="era-card green">
+      <h3>2012 · 1.1–1.2</h3>
+      <ul>
+        <li>1.1：加入附魔系统、语言系统、丛林生物群系</li>
+        <li>1.2：加入铁傀儡、豹猫、丛林树木，世界高度上限提升至256</li>
+        <li>YouTube 上 Minecraft 视频播放量爆发式增长</li>
+        <li>游戏登陆 Xbox 360 主机平台</li>
+      </ul>
+    </div>
+    <div class="era-card gold">
+      <h3>2013 · 1.3–1.4</h3>
+      <ul>
+        <li>1.3：冒险模式、村民交易、单人世界（合并服务器/单人）</li>
+        <li>1.4 Pretty Scary Update：凋灵 Boss、信标、命令方块、女巫</li>
+        <li>MINECON 成为年度盛会，吸引数万玩家</li>
+        <li>PlayStation 3 版本发布</li>
+      </ul>
+    </div>
+    <div class="era-card blue">
+      <h3>2014 · 1.5–1.7 & 收购</h3>
+      <ul>
+        <li>1.5 Redstone Update：红石比较器、侦测器、阳光传感器</li>
+        <li>1.6 Horse Update：马匹、地毯、新的材质包系统</li>
+        <li>1.7 The Update that Changed the World：全新世界生成</li>
+        <li style="color: var(--gold);">★ 2014年9月：微软以 25 亿美元收购 Mojang</li>
+      </ul>
+    </div>
+  </div>
+
+  <!--
+    中国分支区域
+    用 .tl-branch 代替 .tl-item，配合红色主题色区分。
+  -->
+  <div style="margin-top: 2.5rem;">
+    <p style="text-align: center; margin-bottom: 1.5rem;">
+      <span class="pixel-font" style="font-size: 0.55rem; color: var(--redstone); background: rgba(255,26,26,0.1); padding: 4px 12px; border: 2px solid rgba(255,26,26,0.2);">🇨🇳 中国分支</span>
+    </p>
+    <div class="timeline">
+      <div class="tl-branch fade-in">
+        <div class="tl-branch-line"></div>
+        <div class="tl-branch-card">
+          <span class="branch-tag">中国 · 2011–2013</span>
+          <div class="branch-title">民间传播时代</div>
+          <p class="branch-text">Minecraft 通过民间汉化版本进入中国。百度贴吧"Minecraft吧"成为核心阵地，B站UP主的实况视频推动了知名度。玩家们自发翻译游戏内容，建立了中文 Wiki。由于没有官方渠道，盗版和正版并行传播，但社区氛围热情而纯粹。</p>
+        </div>
+      </div>
+      <div class="tl-branch fade-in">
+        <div class="tl-branch-line"></div>
+        <div class="tl-branch-card">
+          <span class="branch-tag">中国 · 2014–2016</span>
+          <div class="branch-title">多玩我的世界盒子</div>
+          <p class="branch-text">"多玩我的世界盒子"成为国内最受欢迎的 Minecraft 辅助工具，集模组管理、多人联机、地图下载、社区交流于一体。它大幅降低了中国玩家的上手门槛，高峰期用户数以千万计，是 Minecraft 在中国大众化传播的关键推手。</p>
+        </div>
+      </div>
+      <div class="tl-branch fade-in">
+        <div class="tl-branch-line"></div>
+        <div class="tl-branch-card">
+          <span class="branch-tag">中国 · 2014–2016</span>
+          <div class="branch-title">服务器小游戏热潮</div>
+          <p class="branch-text">Hypixel 等海外服务器小游戏在国内玩家中引爆热潮。起床战争、空岛战争、密室逃脱等玩法通过视频传播开来，国内也涌现大量私服。"MC服务器"成为青少年社交的重要场景，很多玩家由此第一次接触到多人在线游戏。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 里程碑高亮 -->
+  <div class="milestone-box fade-in">
+    <span class="pixel-font">★ 里程碑 ★</span>
+    <p style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-top: 0.5rem;">
+      2014年9月15日，微软宣布以 25 亿美元收购 Mojang 及 Minecraft 知识产权
+    </p>
+    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">
+      这是游戏史上最大规模的收购案之一。Notch 退出项目，Minecraft 进入企业化运营时代。
+      Mojang 团队继续负责游戏开发，微软提供资源与全球发行支持。
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 微软时代 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-gold"></div>
+  </div>
+</div>
+
+<section class="section" id="microsoft">
+  <div class="section-header">
+    <h2 class="section-title blue">微软时代 · 2015–2019</h2>
+    <p class="section-desc">在微软的推动下，Minecraft 实现了跨平台统一，内容更新更加宏大，中国版也正式落地。</p>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item fade-in">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <span class="tl-year">2015–2016</span>
+        <div class="tl-title">战斗与探索更新</div>
+        <span class="tl-version">1.8 – 1.11</span>
+        <p class="tl-text">1.8 Bountiful Update 加入海底神殿、守卫者、兔子；1.9 Combat Update 引入双持系统和盾牌机制；1.10 Frostburn Update 加入北极熊、岩浆块；1.11 Exploration Update 加入唤魔者、潜影盒、林地府邸。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot blue"></div>
+      <div class="tl-content">
+        <span class="tl-year">2017</span>
+        <div class="tl-title">基岩版统一 & 中国版上线</div>
+        <span class="tl-version">1.12 World of Color Update</span>
+        <p class="tl-text">1.12 加入了鹦鹉、混凝土、彩色床等，被称为"模组玩家的天堂"。同年，Minecraft 实现了 Java 版与基岩版（Bedrock Edition）的品牌统一，跨平台联机成为现实。网易代理的中国版也于这一年正式开启测试。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <span class="tl-year">2018</span>
+        <div class="tl-title">海洋更新</div>
+        <span class="tl-version">1.13 Update Aquatic</span>
+        <p class="tl-text">彻底重塑了海洋体验：加入海豚、海龟、溺尸、三叉戟、气泡柱、沉船遗迹、珊瑚礁等。水的渲染和鱼类生态全面升级，让海底世界焕然一新。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <span class="tl-year">2019</span>
+        <div class="tl-title">村庄与掠夺更新</div>
+        <span class="tl-version">1.14 Village & Pillage</span>
+        <p class="tl-text">村庄全面重做，加入新的村民 AI 和工作站点。掠夺者前哨站、劫掠事件、熊猫、狐狸等新生物加入。UI 也进行了大规模更新。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 中国分支：网易代理 -->
+  <div style="margin-top: 2.5rem;">
+    <p style="text-align: center; margin-bottom: 1.5rem;">
+      <span class="pixel-font" style="font-size: 0.55rem; color: var(--redstone); background: rgba(255,26,26,0.1); padding: 4px 12px; border: 2px solid rgba(255,26,26,0.2);">🇨🇳 中国分支</span>
+    </p>
+    <div class="timeline">
+      <div class="tl-branch fade-in">
+        <div class="tl-branch-line"></div>
+        <div class="tl-branch-card">
+          <span class="branch-tag">中国 · 2016–2017</span>
+          <div class="branch-title">盒子时代落幕</div>
+          <p class="branch-text">随着网易获得独家代理权，"多玩我的世界盒子"等第三方工具因版权问题逐步下线。大量盒子用户迁移至中国版，社区经历了从"民间自由生态"到"官方规范化运营"的转型阵痛。部分玩家对转型感到不舍，但也认可正版化的必要性。</p>
+        </div>
+      </div>
+      <div class="tl-branch fade-in">
+        <div class="tl-branch-line"></div>
+        <div class="tl-branch-card">
+          <span class="branch-tag">中国 · 2017年8月–10月</span>
+          <div class="branch-title">中国版正式开启测试</div>
+          <p class="branch-text">8月 PC Java 版测试，10月手机版（基岩版）公测。采用免费下载模式，大幅降低入门门槛。开服工具和开发者平台同步上线，网易承诺打造"中国版内容生态"。</p>
+        </div>
+      </div>
+      <div class="tl-branch fade-in">
+        <div class="tl-branch-line"></div>
+        <div class="tl-branch-card">
+          <span class="branch-tag">中国 · 2018–2019</span>
+          <div class="branch-title">用户爆发式增长</div>
+          <p class="branch-text">2018年注册用户突破1亿，2019年突破3亿。组件中心（内容商城）、开发者平台陆续上线，教育版也开始在部分学校试点。网易版通过频繁的联动活动和低门槛运营，快速覆盖了更广泛的用户群体。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 现代更新 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-purple" style="background:var(--ender-purple);box-shadow:inset -2px -2px 0 rgba(0,0,0,0.2),inset 2px 2px 0 rgba(255,255,255,0.15)"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-diamond"></div>
+  </div>
+</div>
+
+<section class="section" id="modern">
+  <div class="section-header">
+    <h2 class="section-title purple">现代更新 · 2020–2025</h2>
+    <p class="section-desc">Minecraft 持续进化，每一次大型更新都重新定义着游戏的边界。社区投票驱动的更新模式让每位玩家都能参与游戏发展方向。</p>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item fade-in">
+      <div class="tl-dot red"></div>
+      <div class="tl-content">
+        <span class="tl-year">2020</span>
+        <div class="tl-title">下界更新</div>
+        <span class="tl-version">1.16 Nether Update</span>
+        <p class="tl-text">下界维度迎来彻底重做：加入三个全新的生物群系（绯红森林、诡异森林、灵魂沙谷）、远古残骸（下界合金）、猪灵交易系统和新音乐。这是下界自诞生以来最大规模的变革。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <span class="tl-year">2021</span>
+        <div class="tl-title">洞穴与悬崖</div>
+        <span class="tl-version">1.17–1.18 Caves & Cliffs</span>
+        <p class="tl-text">1.17 加入繁茂洞穴、发光浆果、美西螈、山羊、铜矿石和蜡烛。1.18 彻底重做了世界生成：洞穴高度扩展至 Y=-64，山脉可达 Y=320，加入了壮观的溶洞、地下河流和全新的地形生成算法。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <span class="tl-year">2022</span>
+        <div class="tl-title">荒野更新</div>
+        <span class="tl-version">1.19 The Wild Update</span>
+        <p class="tl-text">加入深暗之域（Deep Dark）和远古城市，监守者（Warden）作为最强大的非 Boss 生物登场。全新的声音传播机制让探险充满了紧张感。红树林沼泽和青蛙、萤火虫等新生物也一并加入。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot blue"></div>
+      <div class="tl-content">
+        <span class="tl-year">2023</span>
+        <div class="tl-title">足迹与故事</div>
+        <span class="tl-version">1.20 Trails & Tales</span>
+        <p class="tl-text">加入考古系统（可疑的沙子/砂砾）、骆驼、嗅探兽、樱花树林生物群系、盔甲纹饰和模板系统。鼓励玩家用方块和物品讲述自己的故事，记录探索的足迹。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot purple"></div>
+      <div class="tl-content">
+        <span class="tl-year">2024</span>
+        <div class="tl-title">棘巧更新</div>
+        <span class="tl-version">1.21 Tricky Trials</span>
+        <p class="tl-text">加入试炼密室（Trial Chambers）、棘巧生物系列、重锤武器系统、风弹和新的战利品机制。为冒险和战斗玩法带来了全新的深度。</p>
+      </div>
+    </div>
+
+    <div class="tl-item fade-in">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-content">
+        <span class="tl-year">2025</span>
+        <div class="tl-title">花园苏醒 & 持续进化</div>
+        <span class="tl-version">1.21.5 Garden Awakening</span>
+        <p class="tl-text">加入苍白花园（Pale Garden）生物群系、苍白橡树、嘎枝（Bogged）等新内容。Minecraft 持续通过定期更新保持活力，社区驱动的创作模式让游戏持续焕发新的生命力。截至目前，全球销量已超 3 亿份。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 中国分支：持续增长 -->
+  <div style="margin-top: 2.5rem;">
+    <p style="text-align: center; margin-bottom: 1.5rem;">
+      <span class="pixel-font" style="font-size: 0.55rem; color: var(--redstone); background: rgba(255,26,26,0.1); padding: 4px 12px; border: 2px solid rgba(255,26,26,0.2);">🇨🇳 中国分支</span>
+    </p>
+    <div class="timeline">
+      <div class="tl-branch fade-in">
+        <div class="tl-branch-line"></div>
+        <div class="tl-branch-card">
+          <span class="branch-tag">中国 · 2020–2023</span>
+          <div class="branch-title">生态成熟 & 用户破纪录</div>
+          <p class="branch-text">注册用户持续攀升：2020年4亿，2022年6亿，2023年7亿。大量中国创作者通过组件中心获得收入，游戏活动频繁与中国节日和文化联动。</p>
+        </div>
+      </div>
+      <div class="tl-branch fade-in">
+        <div class="tl-branch-line"></div>
+        <div class="tl-branch-card">
+          <span class="branch-tag">中国 · 2024–2025</span>
+          <div class="branch-title">8亿用户 & 持续繁荣</div>
+          <p class="branch-text">截至2025年，中国版注册用户突破8亿大关，成为全球最大的 Minecraft 玩家社区。Minecraft 在中国已远超游戏本身——成为一代年轻人的创意平台、社交空间和教育工具。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 文化遗产 ==================== -->
+<div class="chapter-divider">
+  <div class="pixel-art-row">
+    <div class="mini-block block-grass"></div>
+    <div class="mini-block block-dirt"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-gold"></div>
+    <div class="mini-block block-diamond"></div>
+    <div class="mini-block block-stone"></div>
+    <div class="mini-block block-dirt"></div>
+    <div class="mini-block block-grass"></div>
+  </div>
+</div>
+
+<section class="section" id="legacy">
+  <div class="section-header">
+    <h2 class="section-title gold">文化遗产与影响</h2>
+    <p class="section-desc">Minecraft 不仅是一款游戏，更是一种文化现象，深刻影响了游戏产业、教育领域和创意社区。</p>
+  </div>
+
+  <div class="era-grid fade-in">
+    <div class="era-card green">
+      <h3>游戏产业</h3>
+      <ul>
+        <li>开创了"沙盒生存"品类，启发了无数后续作品</li>
+        <li>证明了独立游戏可以成为全球现象</li>
+        <li>推动了 UGC（用户生成内容）和模组文化的发展</li>
+        <li>全球销量超3亿份，史上最畅销的电子游戏</li>
+      </ul>
+    </div>
+    <div class="era-card blue">
+      <h3>教育应用</h3>
+      <ul>
+        <li>Minecraft Education 被全球数千所学校采用</li>
+        <li>用于教授编程、建筑、历史、化学等学科</li>
+        <li>中国版也在教育领域积极推广</li>
+        <li>培养了大量年轻人的创造力和逻辑思维</li>
+      </ul>
+    </div>
+    <div class="era-card purple">
+      <h3>社区与文化</h3>
+      <ul>
+        <li>MINECON 成为全球玩家年度盛会</li>
+        <li>YouTube/B站 上 Minecraft 内容累计播放量达数千亿</li>
+        <li>像素艺术、建筑创作成为独特的艺术形式</li>
+        <li>苦力怕、末影人等角色成为流行文化符号</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="milestone-box fade-in">
+    <span class="pixel-font">致所有玩家</span>
+    <p style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-top: 0.8rem; line-height: 1.8;">
+      "Minecraft 不是关于到达某个终点，<br>而是关于旅程本身。"<br>
+      <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 400;">
+        每一次放置方块，都是一次创造；每一次进入世界，都是一段新的冒险。
+      </span>
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 页脚 ==================== -->
+<div class="ground-deco"></div>
+
+<!--
+  <footer> 是语义化的页脚标签。
+  通常包含版权信息、免责声明等。
+-->
+<footer class="footer">
+  <p class="pixel-font" style="margin-bottom: 1rem;">MINECRAFT 发展史</p>
+  <p>从 2009 年的 Cave Game 到全球 3 亿+ 销量的传奇</p>
+  <p style="margin-top: 1rem; font-size: 0.75rem; color: var(--stone-gray);">
+    本站为粉丝作品，Minecraft 是 Mojang Studios / Microsoft 的注册商标。<br>
+    内容基于公开资料整理，仅供学习交流使用。
+  </p>
+</footer>
+
+
+<!--
+  ====================================================================
+  JavaScript 部分
+  ====================================================================
+  这个页面的 JavaScript 只做两件事：
+  1. 滚动入场动画（IntersectionObserver API）
+  2. 导航链接的平滑滚动
+
+  <script> 放在 </body> 之前，确保 HTML 元素都已加载完成。
+  也可以用 <script defer> 放在 <head> 里，效果类似。
+-->
+<script>
+/*
+  【知识点】DOMContentLoaded 事件
+  当 HTML 文档完全解析后触发（不等待图片、样式表等加载完成）。
+  这确保了我们操作 DOM 元素时，它们都已经存在了。
+
+  另一种写法是把 <script> 放在 </body> 前面（就像这里做的），
+  也能保证 DOM 已加载。但用 DOMContentLoaded 更保险。
+*/
+document.addEventListener('DOMContentLoaded', () => {
+
+  /*
+    【知识点】IntersectionObserver API（交叉观察器）
+    这是现代浏览器提供的"元素可见性检测"API。
+    比传统的 scroll 事件监听性能好得多（不需要在每次滚动时计算）。
+
+    工作原理：
+    1. 创建一个 observer 对象，传入回调函数和配置
+    2. 让 observer "观察"某些元素（.observe(element)）
+    3. 当被观察的元素进入/离开视口时，回调函数自动触发
+
+    配置参数：
+    - threshold: 0.1 → 元素露出 10% 时就触发
+    - rootMargin: '0px 0px -50px 0px' → 底部缩小 50px
+      （元素需要进入视口底部以上 50px 才算"可见"，
+       这样动画不会在元素刚露出一点点就开始）
+
+    回调函数中：
+    - entry.isIntersecting → 元素是否正在视口中
+    - 如果是，给元素加上 'visible' 类 → 触发 CSS 过渡动画
+
+    注意：这里只加不删——元素一旦进入视口就保持可见，
+    不会因为滚回去又变透明。
+  */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  });
+
+  // 找到所有 .fade-in 元素，让 observer 观察它们
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  /*
+    【知识点】平滑滚动导航
+    虽然 CSS 的 scroll-behavior: smooth 已经能实现平滑滚动，
+    但这里用 JavaScript 再实现一次，是为了更精确地控制滚动行为。
+
+    思路：
+    1. 找到所有 .nav-link（导航链接）
+    2. 给每个链接加点击事件监听器
+    3. 阻止默认跳转行为（e.preventDefault()）
+    4. 读取 href 属性（比如 "#origin"），找到对应的目标元素
+    5. 调用 target.scrollIntoView() 平滑滚动到目标位置
+
+    scrollIntoView() 的参数：
+    - behavior: 'smooth' → 平滑滚动
+    - block: 'start' → 目标元素滚动到视口顶部
+
+    为什么要用 JS 而不是纯 CSS？
+    CSS 的 scroll-behavior: smooth 在某些场景下不够灵活，
+    比如需要偏移 sticky 导航栏的高度时。
+    JS 方案可以精确控制滚动的每个细节。
+  */
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>
+
+<!--
+  ====================================================================
+  恭喜你读完了全部注释！
+  ====================================================================
+
+  回顾一下这个页面用到的核心技术：
+
+  1. HTML 语义化标签
+     <section> <nav> <footer> <h1>~<h2> 等
+
+  2. CSS 布局
+     - Flexbox（一维布局：导航栏、方块排列）
+     - CSS Grid（二维布局：卡片网格，auto-fit + minmax 实现自动响应式）
+
+  3. CSS 定位
+     - position: relative/absolute（时间线圆点、星空层）
+     - position: sticky（粘性导航栏）
+
+  4. CSS 视觉效果
+     - CSS Variables（变量管理颜色主题）
+     - linear-gradient / radial-gradient（渐变背景、像素方块）
+     - repeating-linear-gradient（重复渐变做条纹图案）
+     - box-shadow（内阴影模拟立体感、外阴影做发光效果）
+     - text-shadow（像素风格文字阴影）
+     - ::before / ::after 伪元素（装饰层、自定义列表标记）
+
+  5. CSS 动画
+     - @keyframes + animation（漂浮、弹跳、闪烁）
+     - transition（悬停过渡效果）
+     - animation-delay（错开动画，形成波浪效果）
+
+  6. 响应式设计
+     - clamp()（响应式字号）
+     - @media 媒体查询（小屏幕布局调整）
+     - Grid auto-fit（自动列数）
+     - viewport meta 标签
+
+  7. JavaScript
+     - IntersectionObserver（高性能滚动检测）
+     - DOMContentLoaded（DOM 就绪检测）
+     - addEventListener（事件监听）
+     - scrollIntoView（程序化滚动）
+
+  如果你想进一步学习，推荐以下资源：
+  - MDN Web Docs（Mozilla 开发者网络）：最权威的 Web 技术文档
+    https://developer.mozilla.org/zh-CN/
+  - CSS Tricks：CSS 技巧和教程
+    https://css-tricks.com/
+  - Flexbox Froggy：通过游戏学习 Flexbox
+    https://flexboxfroggy.com/
+  - Grid Garden：通过游戏学习 CSS Grid
+    https://cssgridgarden.com/
+
+  ====================================================================
+-->
