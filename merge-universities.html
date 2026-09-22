@@ -28,11 +28,16 @@ canvas{display:block;width:100%}
 #footer{padding:8px 16px;background:linear-gradient(135deg,#1a1a3e,#2a2a5e);border-radius:0 0 12px 12px;border:2px solid #3a3a6e;border-top:none;text-align:center;color:#666;font-size:12px}
 #game-over{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:100;flex-direction:column;justify-content:center;align-items:center;border-radius:12px}
 #game-over.show{display:flex}
-#game-over h2{color:#ff4444;font-size:36px;margin-bottom:10px;text-shadow:0 0 20px rgba(255,68,68,0.5)}
+#game-over h2{font-size:36px;margin-bottom:10px;text-shadow:0 0 20px currentColor}
 #game-over .final-score{color:#ffd700;font-size:24px;margin-bottom:24px}
-#game-over button{padding:12px 40px;font-size:18px;background:linear-gradient(135deg,#4CAF50,#45a049);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;transition:transform 0.1s}
+#game-over .btn-row{display:flex;gap:16px}
+#game-over button{padding:12px 32px;font-size:16px;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;transition:transform 0.1s}
 #game-over button:hover{transform:scale(1.05)}
 #game-over button:active{transform:scale(0.95)}
+.btn-restart{background:linear-gradient(135deg,#4CAF50,#45a049)}
+.btn-continue{background:linear-gradient(135deg,#2196F3,#1976D2)}
+.btn-newgame{background:linear-gradient(135deg,#FF9800,#F57C00)}
+#high-score{position:absolute;bottom:8px;right:12px;color:rgba(255,215,0,0.5);font-size:12px;z-index:10;pointer-events:none}
 #loading{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(15,15,35,0.95);z-index:200;display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:12px;color:#aaa;font-size:16px}
 #loading .spinner{width:40px;height:40px;border:4px solid #3a3a6e;border-top-color:#ffd700;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:16px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -47,10 +52,11 @@ canvas{display:block;width:100%}
     <canvas id="gameCanvas" width="420" height="620"></canvas>
     <div id="loading"><div class="spinner"></div>加载中...</div>
     <div id="game-over">
-      <h2>游戏结束</h2>
+      <h2 id="game-over-title">游戏结束</h2>
       <div class="final-score" id="final-score">最终分数: 0</div>
-      <button id="restart-btn">重新开始</button>
+      <div class="btn-row" id="btn-row"></div>
     </div>
+    <div id="high-score">最高分: 0</div>
   </div>
   <div id="footer">点击屏幕投放校徽 · 相同校徽合并为更大的大学</div>
 </div>
@@ -94,6 +100,8 @@ Composite.add(engine.world, [
 let score = 0, currentTier = 0, nextTier = randTier();
 let gameOver = false, canDrop = true, dropCooldown = 0;
 let uniBodies = [], particles = [], previewX = W/2;
+let highScore = parseInt(localStorage.getItem('mergeUniHighScore') || '0');
+document.getElementById('high-score').textContent = '最高分: ' + highScore;
 
 function randTier(){
   const r = Math.random();
@@ -308,6 +316,8 @@ function doMerge(a, b){
   spawnMergeEffect(mx, my, UNIS[newTier].color);
   if(newTier === UNIS.length - 1){
     spawnMergeEffect(mx, my, '#ffd700', 28);
+    // 合成出北京大学，触发胜利
+    setTimeout(()=> showVictory(), 600);
   }
 }
 
@@ -403,13 +413,55 @@ function checkGameOver(){
   }
 }
 
-function endGame(){
-  gameOver = true;
-  document.getElementById('final-score').textContent = '最终分数: '+score;
-  document.getElementById('game-over').classList.add('show');
+function updateHighScore(){
+  if(score > highScore){
+    highScore = score;
+    localStorage.setItem('mergeUniHighScore', String(highScore));
+    document.getElementById('high-score').textContent = '最高分: ' + highScore;
+  }
 }
 
-document.getElementById('restart-btn').addEventListener('click', ()=>{
+function showOverlay(title, titleColor, buttons){
+  const overlay = document.getElementById('game-over');
+  const titleEl = document.getElementById('game-over-title');
+  const scoreEl = document.getElementById('final-score');
+  const btnRow = document.getElementById('btn-row');
+
+  titleEl.textContent = title;
+  titleEl.style.color = titleColor;
+  scoreEl.textContent = '分数: ' + score;
+  btnRow.innerHTML = '';
+
+  for(const btn of buttons){
+    const el = document.createElement('button');
+    el.textContent = btn.text;
+    el.className = btn.cls || 'btn-restart';
+    el.addEventListener('click', btn.action);
+    btnRow.appendChild(el);
+  }
+
+  overlay.classList.add('show');
+}
+
+function showVictory(){
+  updateHighScore();
+  showOverlay('恭喜合成北京大学！', '#ffd700', [
+    { text:'继续游玩', cls:'btn-continue', action:()=>{
+      document.getElementById('game-over').classList.remove('show');
+    }},
+    { text:'再来一局', cls:'btn-newgame', action: resetGame }
+  ]);
+}
+
+function endGame(){
+  gameOver = true;
+  updateHighScore();
+  showOverlay('游戏结束', '#ff4444', [
+    { text:'重新开始', cls:'btn-restart', action: resetGame }
+  ]);
+}
+
+function resetGame(){
   for(const b of uniBodies) Composite.remove(engine.world, b);
   uniBodies = []; particles = [];
   contactFrames.clear();
@@ -417,7 +469,7 @@ document.getElementById('restart-btn').addEventListener('click', ()=>{
   currentTier = randTier(); nextTier = randTier();
   document.getElementById('score-display').textContent = '分数: 0';
   document.getElementById('game-over').classList.remove('show');
-});
+}
 
 // ==================== 主循环 ====================
 const FRAME_MS = 1000/60;
