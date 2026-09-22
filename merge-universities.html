@@ -103,10 +103,14 @@ let uniBodies = [], particles = [], previewX = W/2;
 let highScore = parseInt(localStorage.getItem('mergeUniHighScore') || '0');
 document.getElementById('high-score').textContent = '最高分: ' + highScore;
 
+// 动态生成概率：首次合成 lv4+ 时调整
+let pTier0 = 0.79, pTier1 = 0.19, pTier2 = 0.02;
+const reachedTiers = new Set(); // 记录已合成过的等级
+
 function randTier(){
   const r = Math.random();
-  if(r < 0.79) return 0;
-  if(r < 0.98) return 1;
+  if(r < pTier0) return 0;
+  if(r < pTier0 + pTier1) return 1;
   return 2;
 }
 
@@ -319,6 +323,14 @@ function doMerge(a, b){
     // 合成出北京大学，触发胜利
     setTimeout(()=> showVictory(), 600);
   }
+
+  // 首次合成 lv4 及以上时，调整生成概率
+  if(newTier >= 3 && !reachedTiers.has(newTier)){
+    reachedTiers.add(newTier);
+    pTier0 = Math.max(0.30, pTier0 - 0.02);
+    pTier1 += 0.01;
+    pTier2 += 0.01;
+  }
 }
 
 Events.on(engine, 'collisionStart', function(e){
@@ -466,6 +478,8 @@ function resetGame(){
   uniBodies = []; particles = [];
   contactFrames.clear();
   score = 0; gameOver = false; canDrop = true; dropCooldown = 0;
+  pTier0 = 0.79; pTier1 = 0.19; pTier2 = 0.02;
+  reachedTiers.clear();
   currentTier = randTier(); nextTier = randTier();
   document.getElementById('score-display').textContent = '分数: 0';
   document.getElementById('game-over').classList.remove('show');
