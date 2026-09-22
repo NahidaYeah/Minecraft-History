@@ -16,15 +16,13 @@ body{
 }
 #game-container{position:relative;width:420px;max-width:100vw}
 #header{
-  display:flex;justify-content:space-between;align-items:center;
+  display:flex;justify-content:center;align-items:center;
   padding:10px 16px;
   background:linear-gradient(135deg,#1a1a3e,#2a2a5e);
   border-radius:12px 12px 0 0;
   border:2px solid #3a3a6e;border-bottom:none;
 }
 #score-display{color:#ffd700;font-size:20px;font-weight:bold;text-shadow:0 0 10px rgba(255,215,0,0.5)}
-#next-display{display:flex;align-items:center;gap:8px;color:#aaa;font-size:14px}
-#next-icon{width:28px;height:28px;border-radius:50%;display:inline-block;border:2px solid rgba(255,255,255,0.3)}
 #canvas-wrap{position:relative;border-left:2px solid #3a3a6e;border-right:2px solid #3a3a6e;background:#12122a;cursor:pointer}
 canvas{display:block;width:100%}
 #footer{padding:8px 16px;background:linear-gradient(135deg,#1a1a3e,#2a2a5e);border-radius:0 0 12px 12px;border:2px solid #3a3a6e;border-top:none;text-align:center;color:#666;font-size:12px}
@@ -35,16 +33,19 @@ canvas{display:block;width:100%}
 #game-over button{padding:12px 40px;font-size:18px;background:linear-gradient(135deg,#4CAF50,#45a049);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;transition:transform 0.1s}
 #game-over button:hover{transform:scale(1.05)}
 #game-over button:active{transform:scale(0.95)}
+#loading{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(15,15,35,0.95);z-index:200;display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:12px;color:#aaa;font-size:16px}
+#loading .spinner{width:40px;height:40px;border:4px solid #3a3a6e;border-top-color:#ffd700;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:16px}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 <div id="game-container">
   <div id="header">
     <div id="score-display">分数: 0</div>
-    <div id="next-display">下一个: <span id="next-icon"></span><span id="next-name"></span></div>
   </div>
   <div id="canvas-wrap">
     <canvas id="gameCanvas" width="420" height="620"></canvas>
+    <div id="loading"><div class="spinner"></div>加载中...</div>
     <div id="game-over">
       <h2>游戏结束</h2>
       <div class="final-score" id="final-score">最终分数: 0</div>
@@ -65,16 +66,17 @@ const WALL_T = 14;
 const DANGER_Y = 80;
 const DROP_Y = 40;
 
-// 8 个大学等级（新增清华大学）
+// 9 个大学等级：清华(最小) → 北大(最大)
 const UNIS = [
-  { name:'郑州大学',         short:'郑大',   color:'#2E7D32', radius:22, score:1  },
-  { name:'南京工业大学',     short:'南工大', color:'#00796B', radius:30, score:3  },
-  { name:'中南财经政法大学', short:'中南财', color:'#E65100', radius:38, score:6  },
-  { name:'华中农业大学',     short:'华农',   color:'#558B2F', radius:47, score:10 },
-  { name:'湖南大学',         short:'湖大',   color:'#1565C0', radius:57, score:15 },
-  { name:'北京理工大学',     short:'北理工', color:'#6A1B9A', radius:68, score:21 },
-  { name:'清华大学',         short:'清华',   color:'#7B1FA2', radius:74, score:28 },
-  { name:'北京大学',         short:'北大',   color:'#C62828', radius:82, score:36 },
+  { name:'清华大学',         color:'#7B1FA2', radius:18, score:1,  img:'tsinghua.webp'  },
+  { name:'郑州大学',         color:'#2E7D32', radius:24, score:3,  img:'zhengzhou.png'  },
+  { name:'南京工业大学',     color:'#00796B', radius:32, score:6,  img:'nanjing-tech.png'},
+  { name:'中南财经政法大学', color:'#E65100', radius:40, score:10, img:'zhongnan.png'   },
+  { name:'武汉理工大学',     color:'#1565C0', radius:48, score:15, img:'wuhan-tech.png' },
+  { name:'华中农业大学',     color:'#558B2F', radius:56, score:21, img:'huazhong-agri.png'},
+  { name:'湖南大学',         color:'#1565C0', radius:64, score:28, img:'hunan.png'      },
+  { name:'北京理工大学',     color:'#6A1B9A', radius:74, score:36, img:'beijing-tech.png'},
+  { name:'北京大学',         color:'#C62828', radius:82, score:45, img:'peking.webp'    },
 ];
 
 // ==================== Matter.js 物理引擎 ====================
@@ -93,150 +95,76 @@ let score = 0, currentTier = 0, nextTier = randTier();
 let gameOver = false, canDrop = true, dropCooldown = 0;
 let uniBodies = [], particles = [], previewX = W/2;
 
-function randTier(){ return Math.floor(Math.random()*3); }
+function randTier(){
+  const r = Math.random();
+  if(r < 0.79) return 0;
+  if(r < 0.98) return 1;
+  return 2;
+}
 
 // ==================== Canvas 渲染 ====================
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-function lighten(hex, amt){
-  let r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
-  return '#'+[
-    Math.max(0,Math.min(255,r+amt)),
-    Math.max(0,Math.min(255,g+amt)),
-    Math.max(0,Math.min(255,b+amt))
-  ].map(v=>v.toString(16).padStart(2,'0')).join('');
-}
-function darken(hex, amt){ return lighten(hex, -amt); }
+// ==================== 图片加载 ====================
+const imgCache = [];
+let imagesLoaded = 0;
+const totalImages = UNIS.length;
 
-// ==================== 预渲染校徽纹理 ====================
-const emblemCache = [];
-
-function createEmblem(tier){
+function loadImage(tier){
   const u = UNIS[tier];
-  const r = u.radius;
-  const pad = 6;
-  const s = (r+pad)*2;
-  const c = document.createElement('canvas');
-  c.width = c.height = s;
-  const g = c.getContext('2d');
-  const cx = s/2, cy = s/2;
-
-  // === 外圈光晕 ===
-  const glow = g.createRadialGradient(cx,cy,r*0.6,cx,cy,r+pad);
-  glow.addColorStop(0, u.color+'66');
-  glow.addColorStop(1, u.color+'00');
-  g.fillStyle = glow;
-  g.beginPath(); g.arc(cx,cy,r+pad,0,Math.PI*2); g.fill();
-
-  // === 外环（深色底） ===
-  const ringGrad = g.createRadialGradient(cx-r*0.2,cy-r*0.2,r*0.5,cx,cy,r);
-  ringGrad.addColorStop(0, lighten(u.color,25));
-  ringGrad.addColorStop(1, darken(u.color,30));
-  g.fillStyle = ringGrad;
-  g.beginPath(); g.arc(cx,cy,r,0,Math.PI*2); g.fill();
-
-  // === 外环边框 ===
-  g.strokeStyle = 'rgba(255,255,255,0.55)';
-  g.lineWidth = 2.5;
-  g.beginPath(); g.arc(cx,cy,r-0.5,0,Math.PI*2); g.stroke();
-
-  // === 内圈分隔线 ===
-  const innerR = r * 0.68;
-  g.strokeStyle = 'rgba(255,255,255,0.35)';
-  g.lineWidth = 1.5;
-  g.beginPath(); g.arc(cx,cy,innerR,0,Math.PI*2); g.stroke();
-
-  // === 内圈渐变底 ===
-  const innerGrad = g.createRadialGradient(cx-innerR*0.25,cy-innerR*0.25,0,cx,cy,innerR);
-  innerGrad.addColorStop(0, lighten(u.color,55));
-  innerGrad.addColorStop(0.7, lighten(u.color,15));
-  innerGrad.addColorStop(1, u.color);
-  g.fillStyle = innerGrad;
-  g.beginPath(); g.arc(cx,cy,innerR-1,0,Math.PI*2); g.fill();
-
-  // === 环形文字（大学全名） ===
-  const name = u.name;
-  const half = Math.ceil(name.length / 2);
-  const topChars = name.substring(0, half);
-  const botChars = name.substring(half).split('').reverse().join('');
-
-  // 文字大小根据球体调整
-  const charSize = Math.max(7, Math.min(14, r * 0.2));
-  g.font = `bold ${charSize}px "Microsoft YaHei","PingFang SC",sans-serif`;
-  g.fillStyle = '#fff';
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.shadowColor = 'rgba(0,0,0,0.5)';
-  g.shadowBlur = 2;
-
-  const textR = r * 0.84;
-  const arcSpan = Math.PI * 0.7;
-
-  // 上半弧文字
-  const topStart = -Math.PI/2 - arcSpan/2;
-  const topStep = arcSpan / Math.max(1, topChars.length - 1);
-  for(let i=0; i<topChars.length; i++){
-    const a = topStart + topStep * i;
-    g.save();
-    g.translate(cx + Math.cos(a)*textR, cy + Math.sin(a)*textR);
-    g.rotate(a + Math.PI/2);
-    g.fillText(topChars[i], 0, 0);
-    g.restore();
-  }
-
-  // 下半弧文字
-  const botStart = Math.PI/2 + arcSpan/2;
-  const botStep = -arcSpan / Math.max(1, botChars.length - 1);
-  for(let i=0; i<botChars.length; i++){
-    const a = botStart + botStep * i;
-    g.save();
-    g.translate(cx + Math.cos(a)*textR, cy + Math.sin(a)*textR);
-    g.rotate(a - Math.PI/2);
-    g.fillText(botChars[i], 0, 0);
-    g.restore();
-  }
-  g.shadowBlur = 0;
-
-  // === 中心简称 ===
-  const mainSize = Math.max(10, innerR * 0.6);
-  g.font = `bold ${mainSize}px "Microsoft YaHei","PingFang SC",sans-serif`;
-  g.fillStyle = '#fff';
-  g.shadowColor = 'rgba(0,0,0,0.4)';
-  g.shadowBlur = 3;
-  g.fillText(u.short, cx, cy - mainSize*0.12);
-  g.shadowBlur = 0;
-
-  // === 等级标记 ===
-  const lvSize = Math.max(7, innerR*0.28);
-  g.font = `bold ${lvSize}px sans-serif`;
-  g.fillStyle = 'rgba(255,255,255,0.5)';
-  g.fillText('Lv'+(tier+1), cx, cy + mainSize*0.5);
-
-  // === 内圈装饰小点 ===
-  const dotCount = Math.max(8, Math.floor(r * 0.4));
-  g.fillStyle = 'rgba(255,255,255,0.15)';
-  for(let i=0; i<dotCount; i++){
-    const a = (Math.PI*2/dotCount)*i;
-    const dx = cx + Math.cos(a)*(innerR-4);
-    const dy = cy + Math.sin(a)*(innerR-4);
-    g.beginPath(); g.arc(dx,dy,1,0,Math.PI*2); g.fill();
-  }
-
-  return c;
+  const img = new Image();
+  img.onload = function(){
+    imgCache[tier] = img;
+    imagesLoaded++;
+    if(imagesLoaded >= totalImages){
+      document.getElementById('loading').style.display = 'none';
+      startGame();
+    }
+  };
+  img.onerror = function(){
+    // Fallback: create a colored circle if image fails
+    const c = document.createElement('canvas');
+    const s = u.radius * 2;
+    c.width = c.height = s;
+    const g = c.getContext('2d');
+    g.fillStyle = u.color;
+    g.beginPath(); g.arc(s/2, s/2, u.radius, 0, Math.PI*2); g.fill();
+    imgCache[tier] = c;
+    imagesLoaded++;
+    if(imagesLoaded >= totalImages){
+      document.getElementById('loading').style.display = 'none';
+      startGame();
+    }
+  };
+  img.src = u.img;
 }
 
-// 预生成所有等级纹理
-UNIS.forEach((_,i) => { emblemCache[i] = createEmblem(i); });
+// 加载所有图片
+UNIS.forEach((_, i) => loadImage(i));
 
 // ==================== 绘制函数 ====================
 function drawUni(x, y, tier, alpha){
   const u = UNIS[tier];
-  const pad = 6;
-  const s = (u.radius+pad)*2;
+  const img = imgCache[tier];
+  if(!img) return;
+
   ctx.save();
   ctx.globalAlpha = alpha || 1;
-  ctx.drawImage(emblemCache[tier], x - s/2, y - s/2);
+
+  // 圆形裁剪
+  ctx.beginPath();
+  ctx.arc(x, y, u.radius, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+
+  // 绘制图片（保持宽高比，居中填充）
+  const diam = u.radius * 2;
+  let sx=0, sy=0, sw=img.naturalWidth||img.width, sh=img.naturalHeight||img.height;
+  const scale = Math.max(diam/sw, diam/sh);
+  const dw = sw*scale, dh = sh*scale;
+  ctx.drawImage(img, x - dw/2, y - dh/2, dw, dh);
+
   ctx.restore();
 }
 
@@ -272,17 +200,14 @@ function drawPreview(){
   if(!canDrop || gameOver) return;
   const u = UNIS[currentTier];
   ctx.save();
-  ctx.globalAlpha = 0.35;
-  // 绘制预览校徽（半透明）
+  ctx.globalAlpha = 0.4;
   drawUni(previewX, DROP_Y, currentTier, 0.5);
-  // 虚线圆框
   ctx.beginPath();
   ctx.arc(previewX, DROP_Y, u.radius, 0, Math.PI*2);
   ctx.strokeStyle = '#fff';
   ctx.lineWidth = 2;
   ctx.setLineDash([5,4]);
   ctx.stroke();
-  // 投放指示线
   ctx.beginPath();
   ctx.moveTo(previewX, DROP_Y + u.radius + 4);
   ctx.lineTo(previewX, H - WALL_T);
@@ -332,7 +257,6 @@ function createUni(tier, x, y){
     density: 0.0008 + tier*0.0002, label: 'uni'
   });
   body.gameTier = tier;
-  body.mergeCooldown = 0;
   Composite.add(engine.world, body);
   uniBodies.push(body);
   return body;
@@ -351,7 +275,6 @@ function drop(){
   const tier = currentTier;
   currentTier = nextTier;
   nextTier = randTier();
-  updateNextDisplay();
   const body = createUni(tier, previewX, DROP_Y);
   Body.setVelocity(body, { x:(Math.random()-0.5)*1.2, y:1.5 });
 }
@@ -363,7 +286,6 @@ Events.on(engine, 'collisionStart', function(e){
     const a = pair.bodyA, b = pair.bodyB;
     if(a.gameTier === undefined || b.gameTier === undefined) continue;
     if(a.gameTier !== b.gameTier) continue;
-    if(a.mergeCooldown > 0 || b.mergeCooldown > 0) continue;
     if(a.gameTier >= UNIS.length - 1) continue;
 
     const newTier = a.gameTier + 1;
@@ -374,7 +296,6 @@ Events.on(engine, 'collisionStart', function(e){
 
     const newBody = createUni(newTier, mx, my);
     Body.setVelocity(newBody, { x:0, y:-2.5 });
-    newBody.mergeCooldown = 15;
 
     score += UNIS[newTier].score;
     document.getElementById('score-display').textContent = '分数: '+score;
@@ -398,23 +319,24 @@ function updatePreviewX(clientX){
 const canvasWrap = document.getElementById('canvas-wrap');
 canvasWrap.addEventListener('mousemove', e => updatePreviewX(e.clientX));
 canvasWrap.addEventListener('click', e => { updatePreviewX(e.clientX); drop(); });
-canvasWrap.addEventListener('touchmove', e => {
-  e.preventDefault(); updatePreviewX(e.touches[0].clientX);
-}, {passive:false});
-canvasWrap.addEventListener('touchend', e => { e.preventDefault(); drop(); }, {passive:false});
 
-// ==================== 下一个预览 ====================
-function updateNextDisplay(){
-  const u = UNIS[currentTier];
-  document.getElementById('next-icon').style.background = u.color;
-  document.getElementById('next-name').textContent = u.name;
-}
-updateNextDisplay();
+// 触摸：touchstart 更新位置，touchend 投放
+canvasWrap.addEventListener('touchstart', e => {
+  e.preventDefault();
+  updatePreviewX(e.touches[0].clientX);
+}, {passive:false});
+canvasWrap.addEventListener('touchmove', e => {
+  e.preventDefault();
+  updatePreviewX(e.touches[0].clientX);
+}, {passive:false});
+canvasWrap.addEventListener('touchend', e => {
+  e.preventDefault();
+  drop();
+}, {passive:false});
 
 // ==================== 游戏结束检测 ====================
 function checkGameOver(){
   for(const body of uniBodies){
-    if(body.mergeCooldown > 0) continue;
     const r = UNIS[body.gameTier].radius;
     if(body.position.y - r < DANGER_Y
        && Math.abs(body.velocity.y) < 0.4
@@ -441,17 +363,16 @@ document.getElementById('restart-btn').addEventListener('click', ()=>{
   currentTier = randTier(); nextTier = randTier();
   document.getElementById('score-display').textContent = '分数: 0';
   document.getElementById('game-over').classList.remove('show');
-  updateNextDisplay();
 });
 
 // ==================== 主循环 ====================
 const FRAME_MS = 1000/60;
+let gameStarted = false;
 
 function gameLoop(){
   Engine.update(engine, FRAME_MS);
 
   if(!canDrop){ dropCooldown--; if(dropCooldown<=0) canDrop=true; }
-  for(const b of uniBodies){ if(b.mergeCooldown>0) b.mergeCooldown--; }
   for(let i=uniBodies.length-1;i>=0;i--){
     if(uniBodies[i].position.y > H+120) removeBody(uniBodies[i]);
   }
@@ -480,21 +401,26 @@ function gameLoop(){
   ctx.restore();
 }
 
-// 启动
-const runner = Runner.create();
-Runner.run(runner, engine);
+function startGame(){
+  if(gameStarted) return;
+  gameStarted = true;
+  currentTier = randTier();
+  nextTier = randTier();
 
-// 优先使用 rAF，500ms 未启动则回退到 setInterval
-let loopStarted = false;
-try {
-  requestAnimationFrame(function(){
-    loopStarted = true;
-    (function loop(){ gameLoop(); requestAnimationFrame(loop); })();
-  });
-} catch(e){}
-setTimeout(function(){
-  if(!loopStarted) setInterval(gameLoop, FRAME_MS);
-}, 500);
+  const runner = Runner.create();
+  Runner.run(runner, engine);
+
+  let loopStarted = false;
+  try {
+    requestAnimationFrame(function(){
+      loopStarted = true;
+      (function loop(){ gameLoop(); requestAnimationFrame(loop); })();
+    });
+  } catch(e){}
+  setTimeout(function(){
+    if(!loopStarted) setInterval(gameLoop, FRAME_MS);
+  }, 500);
+}
 
 })();
 </script>
