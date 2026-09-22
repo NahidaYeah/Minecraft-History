@@ -158,6 +158,10 @@ function drawUni(x, y, tier, alpha){
   ctx.closePath();
   ctx.clip();
 
+  // 先填充主题色背景，防止图片白边露出
+  ctx.fillStyle = u.color;
+  ctx.fillRect(x - u.radius, y - u.radius, u.radius * 2, u.radius * 2);
+
   // 绘制图片（保持宽高比，居中填充）
   const diam = u.radius * 2;
   let sx=0, sy=0, sw=img.naturalWidth||img.width, sh=img.naturalHeight||img.height;
