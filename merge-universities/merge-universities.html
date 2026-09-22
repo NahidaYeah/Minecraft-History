@@ -449,7 +449,15 @@ function showOverlay(title, titleColor, buttons){
     const el = document.createElement('button');
     el.textContent = btn.text;
     el.className = btn.cls || 'btn-restart';
-    el.addEventListener('click', btn.action);
+    
+    // 同时支持点击和触摸事件
+    const handler = (e) => {
+      e.preventDefault();
+      btn.action();
+    };
+    el.addEventListener('click', handler);
+    el.addEventListener('touchend', handler, {passive: false});
+    
     btnRow.appendChild(el);
   }
 
