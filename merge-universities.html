@@ -280,32 +280,81 @@ function drop(){
 }
 
 // ==================== 碰撞 & 合并 ====================
+// 接触帧计数器：记录每对球体的接触帧数
+const contactFrames = new Map();
+
+function getPairKey(a, b){
+  return a.id < b.id ? a.id+'-'+b.id : b.id+'-'+a.id;
+}
+
+function doMerge(a, b){
+  if(a.gameTier >= UNIS.length - 1) return;
+  const newTier = a.gameTier + 1;
+  const mx = (a.position.x + b.position.x)/2;
+  const my = (a.position.y + b.position.y)/2;
+
+  removeBody(a); removeBody(b);
+
+  const newBody = createUni(newTier, mx, my);
+  Body.setVelocity(newBody, { x:0, y:-2.5 });
+
+  score += UNIS[newTier].score;
+  document.getElementById('score-display').textContent = '分数: '+score;
+
+  spawnMergeEffect(mx, my, UNIS[newTier].color);
+  if(newTier === UNIS.length - 1){
+    spawnMergeEffect(mx, my, '#ffd700', 28);
+  }
+}
+
 Events.on(engine, 'collisionStart', function(e){
   if(gameOver) return;
   for(const pair of e.pairs){
     const a = pair.bodyA, b = pair.bodyB;
     if(a.gameTier === undefined || b.gameTier === undefined) continue;
     if(a.gameTier !== b.gameTier) continue;
-    if(a.gameTier >= UNIS.length - 1) continue;
-
-    const newTier = a.gameTier + 1;
-    const mx = (a.position.x + b.position.x)/2;
-    const my = (a.position.y + b.position.y)/2;
-
-    removeBody(a); removeBody(b);
-
-    const newBody = createUni(newTier, mx, my);
-    Body.setVelocity(newBody, { x:0, y:-2.5 });
-
-    score += UNIS[newTier].score;
-    document.getElementById('score-display').textContent = '分数: '+score;
-
-    spawnMergeEffect(mx, my, UNIS[newTier].color);
-    if(newTier === UNIS.length - 1){
-      spawnMergeEffect(mx, my, '#ffd700', 28);
-    }
+    doMerge(a, b);
   }
 });
+
+// 每帧检查：捕获 collisionStart 未触发的情况（球体已静止接触）
+function checkPendingMerges(){
+  if(gameOver || uniBodies.length < 2) return;
+  for(let i=0; i<uniBodies.length; i++){
+    const a = uniBodies[i];
+    if(a.gameTier === undefined) continue;
+    for(let j=i+1; j<uniBodies.length; j++){
+      const b = uniBodies[j];
+      if(b.gameTier === undefined) continue;
+      if(a.gameTier !== b.gameTier) continue;
+
+      const dx = a.position.x - b.position.x;
+      const dy = a.position.y - b.position.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const minDist = a.circleRadius + b.circleRadius;
+
+      // 球体接触或轻微重叠
+      if(dist <= minDist * 1.05){
+        const key = getPairKey(a, b);
+        const frames = (contactFrames.get(key) || 0) + 1;
+        contactFrames.set(key, frames);
+
+        // 接触超过 4 帧且速度较低时合并
+        if(frames >= 4){
+          const speedA = Math.sqrt(a.velocity.x**2 + a.velocity.y**2);
+          const speedB = Math.sqrt(b.velocity.x**2 + b.velocity.y**2);
+          if(speedA < 3 && speedB < 3){
+            contactFrames.delete(key);
+            doMerge(a, b);
+            return; // 一次只处理一对，避免连锁问题
+          }
+        }
+      } else {
+        contactFrames.delete(getPairKey(a, b));
+      }
+    }
+  }
+}
 
 // ==================== 输入处理 ====================
 function updatePreviewX(clientX){
@@ -359,6 +408,7 @@ function endGame(){
 document.getElementById('restart-btn').addEventListener('click', ()=>{
   for(const b of uniBodies) Composite.remove(engine.world, b);
   uniBodies = []; particles = [];
+  contactFrames.clear();
   score = 0; gameOver = false; canDrop = true; dropCooldown = 0;
   currentTier = randTier(); nextTier = randTier();
   document.getElementById('score-display').textContent = '分数: 0';
@@ -376,6 +426,7 @@ function gameLoop(){
   for(let i=uniBodies.length-1;i>=0;i--){
     if(uniBodies[i].position.y > H+120) removeBody(uniBodies[i]);
   }
+  checkPendingMerges();
   if(!gameOver && dropCooldown<=0 && uniBodies.length>0) checkGameOver();
 
   // ===== 渲染 =====
